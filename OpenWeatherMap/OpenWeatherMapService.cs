@@ -52,11 +52,8 @@ namespace OpenWeatherMap
         {
             var resource = GetResource(parameters);
 
-            using (var client = new HttpClient())
-            {
-                var json = await client.GetStringAsync(resource.Uri).ConfigureAwait(false);
-                return JsonConvert.DeserializeObject<OpenWeatherMapResult>(json);
-            }
+            var json = await HttpClient.GetStringAsync(resource.Uri).ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<OpenWeatherMapResult>(json);
         }
 
         private UriBuilder GetResource(Dictionary<string, string> parameters)
