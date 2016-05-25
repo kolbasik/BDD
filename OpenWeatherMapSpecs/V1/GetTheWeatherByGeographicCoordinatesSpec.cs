@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NBDD;
+using NBDD.V1;
 
-namespace OpenWeatherMapSpecs
+namespace OpenWeatherMapSpecs.V1
 {
     [TestClass]
     public class GetTheWeatherByGeographicCoordinatesSpec : OpenWeatherMapServiceSpec<GetTheWeatherByGeographicCoordinatesSpec>

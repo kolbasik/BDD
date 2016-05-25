@@ -1,32 +1,40 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NBDD;
+using NBDD.V1;
 
-namespace OpenWeatherMapSpecs
+namespace OpenWeatherMapSpecs.V1
 {
     [TestClass]
-    public class GetTheWeatherByCityNameSpec : OpenWeatherMapServiceSpec<GetTheWeatherByCityNameSpec>
+    public class GetTheWeatherByCityIDSpec : OpenWeatherMapServiceSpec<GetTheWeatherByCityIDSpec>
     {
+        public string CityID { get; set; }
         public string CityName { get; set; }
-        public string CountryName { get; set; }
 
         [Bdd.Given]
-        public void Given_I_want_to_know_the_weather_for_London()
+        public void Given_I_want_to_know_the_weather_by_ID()
         {
-            CityName = "London";
-            CountryName = "uk";
+            var spec = Bdd.DependsOn<GetTheWeatherByCityNameSpec>();
+
+            CityID = spec.Result.Id;
+            CityName = spec.Result.Name;
         }
 
         [Bdd.When]
         public async Task When_I_have_asked_the_forecast_by_city_name()
         {
-            Result = await OpenWeatherMapService.GetWeatherForecastAsync(CityName, CountryName).ConfigureAwait(false);
+            Result = await OpenWeatherMapService.GetWeatherForecastAsync(CityID).ConfigureAwait(false);
         }
 
         [Bdd.Then]
         public void Then_I_will_get_the_wheather_forecast()
         {
             Assert.IsNotNull(Result);
+        }
+
+        [Bdd.Then]
+        public void And_the_forecast_will_have_the_city_id()
+        {
+            Assert.AreEqual(CityID, Result.Id);
         }
 
         [Bdd.Then]

@@ -7,7 +7,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NBDD
+namespace NBDD.V1
 {
     public static class Bdd
     {

@@ -10,11 +10,19 @@ namespace OpenWeatherMap
 {
     public sealed class OpenWeatherMapService : IDisposable
     {
-        public OpenWeatherMapService()
+        public OpenWeatherMapService() : this(
+            new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute),
+            @"077cc5480d6fd71002f3999f7b04218c")
         {
+        }
+
+        public OpenWeatherMapService(Uri serviceUri, string appId)
+        {
+            if (serviceUri == null) throw new ArgumentNullException(nameof(serviceUri));
+            if (appId == null) throw new ArgumentNullException(nameof(appId));
             HttpClient = new HttpClient();
-            ServiceUri = new Uri("http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute);
-            AppId = "077cc5480d6fd71002f3999f7b04218c";
+            ServiceUri = serviceUri;
+            AppId = appId;
         }
 
         public void Dispose()
@@ -22,7 +30,7 @@ namespace OpenWeatherMap
             HttpClient.Dispose();
         }
 
-        public HttpClient HttpClient { get; set; }
+        public HttpClient HttpClient { get; private set; }
         public Uri ServiceUri { get; private set; }
         public string AppId { get; private set; }
 
@@ -51,17 +59,18 @@ namespace OpenWeatherMap
         private async Task<OpenWeatherMapResult> ExecuteAsync(Dictionary<string, string> parameters)
         {
             var resource = GetResource(parameters);
-
-            var json = await HttpClient.GetStringAsync(resource.Uri).ConfigureAwait(false);
+            var json = await HttpClient.GetStringAsync(resource).ConfigureAwait(false);
             return JsonConvert.DeserializeObject<OpenWeatherMapResult>(json);
         }
 
-        private UriBuilder GetResource(Dictionary<string, string> parameters)
+        private Uri GetResource(Dictionary<string, string> parameters)
         {
-            parameters = new Dictionary<string, string>(parameters) { { "appid", AppId } };
-            var resource = new UriBuilder(ServiceUri);
-            resource.Query = string.Join("&", parameters.Select(x => string.Format("{0}={1}", x.Key, x.Value)));
-            return resource;
+            parameters = new Dictionary<string, string>(parameters) { { @"appid", AppId } };
+            var resource = new UriBuilder(ServiceUri)
+            {
+                Query = string.Join(@"&", parameters.Select(x => $"{x.Key}={x.Value}"))
+            };
+            return resource.Uri;
         }
     }
 }

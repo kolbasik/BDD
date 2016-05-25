@@ -1,9 +1,9 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NBDD;
+using NBDD.V1;
 using OpenWeatherMap;
 
-namespace OpenWeatherMapSpecs
+namespace OpenWeatherMapSpecs.V1
 {
     [TestClass]
     public abstract class MsSpec<TSpec, TResult> where TSpec : class
