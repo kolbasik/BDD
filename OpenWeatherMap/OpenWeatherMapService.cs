@@ -10,10 +10,11 @@ namespace OpenWeatherMap
 {
     public sealed class OpenWeatherMapService : IDisposable
     {
-        public OpenWeatherMapService() : this(
-            new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute),
-            @"077cc5480d6fd71002f3999f7b04218c")
+        public static OpenWeatherMapService Create()
         {
+            return new OpenWeatherMapService(
+                new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute),
+                @"077cc5480d6fd71002f3999f7b04218c");
         }
 
         public OpenWeatherMapService(Uri serviceUri, string appId)

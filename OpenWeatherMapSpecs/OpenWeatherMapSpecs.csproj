@@ -63,6 +63,9 @@
     <Compile Include="V1\GetTheWeatherByCityNameSpec.cs" />
     <Compile Include="V1\GetTheWeatherByGeographicCoordinatesSpec.cs" />
     <Compile Include="V1\MsSpec.cs" />
+    <Compile Include="V2\GetTheWeatherByCityNameSpec.cs" />
+    <Compile Include="V2\Specs\TheWeatherByCityNameSpec.cs" />
+    <Compile Include="V2\Specs\OpenWeatherMapServiceSpec.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NBDD\NBDD.csproj">
@@ -78,9 +81,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="V2\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
