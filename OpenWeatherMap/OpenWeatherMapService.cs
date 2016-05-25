@@ -14,7 +14,7 @@ namespace OpenWeatherMap
         {
             HttpClient = new HttpClient();
             ServiceUri = new Uri("http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute);
-            AppId = "2de143494c0b295cca9337e1e96b00e0";
+            AppId = "077cc5480d6fd71002f3999f7b04218c";
         }
 
         public void Dispose()

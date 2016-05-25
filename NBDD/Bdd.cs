@@ -84,7 +84,7 @@ namespace NBDD
             [DebuggerHidden, DebuggerStepThrough]
             public static async Task<SpecResult> RunAsync<TSpec>(TSpec spec)
             {
-                await Task.Delay(0).ConfigureAwait(false);
+                await Task.Yield();
                 var result = new SpecResult(SpecMeta.For<TSpec>());
                 var queue = new Queue<SpecStepMeta>(result.Meta.Steps);
                 try
@@ -202,13 +202,13 @@ namespace NBDD
             public override string ToString()
             {
                 var sb = new StringBuilder();
-                sb.AppendFormat("Feature: " + Meta.Feature).AppendLine();
-                sb.AppendFormat("Scenario:").AppendLine();
+                sb.AppendFormat(@"Feature: " + Meta.Feature).AppendLine();
+                sb.AppendFormat(@"Scenario:").AppendLine();
                 foreach (var step in Steps)
                 {
                     sb.AppendFormat(
                         "[{0}] : {1}",
-                        step.Success.HasValue ? (step.Success.Value ? "+" : "X") : " ",
+                        step.Success.HasValue ? (step.Success.Value ? @"+" : @"X") : @" ",
                         step.Name);
                     sb.AppendLine();
                 }
