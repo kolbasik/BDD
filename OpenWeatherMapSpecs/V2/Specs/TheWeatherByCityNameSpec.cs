@@ -11,7 +11,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
         public static void Execute(string cityName, string countryName)
         {
             Bdd.Scen<TheWeatherByCityNameSpec>()
-                .When(x => x.Сity_is__cityName(cityName))
+                .Given(x => x.Сity_is__cityName(cityName))
                 .And(x => x.Сountry_is__countryName(countryName))
                 .When(x => x.When_I_have_asked_the_forecast())
                 .Then(x => x.Then_I_will_get_the_wheather_forecast())

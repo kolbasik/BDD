@@ -9,16 +9,6 @@ namespace NBDD.V2
 {
     public static class Bdd
     {
-        public static Scenario<TSpec> Scen<TSpec>() where TSpec : new()
-        {
-            return Scen(new TSpec());
-        }
-
-        public static Scenario<TSpec> Scen<TSpec>(TSpec spec)
-        {
-            return new Scenario<TSpec>(x => Trace.Write(x.Steps.Count.ToString()));
-        }
-
         public enum Stage
         {
             Given,
@@ -26,59 +16,51 @@ namespace NBDD.V2
             Then
         }
 
-        [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+        public static Scenario<TSpec> Scen<TSpec>() where TSpec : new()
+        {
+            return Scen(new TSpec());
+        }
+
+        public static Scenario<TSpec> Scen<TSpec>(TSpec spec)
+        {
+            return new Scenario<TSpec>(x => Trace.WriteLine(x.Steps.Count));
+        }
+
+        [AttributeUsage(AttributeTargets.Method)]
         public abstract class StepAttribute : Attribute
         {
-            protected StepAttribute(Stage stage)
-            {
-                Stage = stage;
-            }
-
-            public Stage Stage { get; private set; }
+            public Stage Stage => EnumX.Parse<Stage>(GetType().Name.Replace(@"Attribute", string.Empty));
             public string Title { get; set; }
         }
 
         public sealed class GivenAttribute : StepAttribute
         {
-            public GivenAttribute() : base(Stage.Given)
-            {
-            }
         }
 
         public sealed class WhenAttribute : StepAttribute
         {
-            public WhenAttribute() : base(Stage.When)
-            {
-            }
         }
 
         public sealed class ThenAttribute : StepAttribute
         {
-            public ThenAttribute() : base(Stage.Then)
-            {
-            }
         }
 
         public sealed class Scenario<TSpec>
         {
-            private readonly Action<Scenario<TSpec>> _execute;
-            private readonly Dictionary<Stage, List<Expression<Action<TSpec>>>> _steps;
-            private Stage _stage;
+            private readonly Action<ScenarioSteps<TSpec>> execute;
+            private readonly ScenarioSteps<TSpec> steps;
+            private Stage stage;
 
-            internal Scenario(Action<Scenario<TSpec>> execute)
+            internal Scenario(Action<ScenarioSteps<TSpec>> execute)
             {
-                if (execute == null) throw new ArgumentNullException(nameof(execute));
-                _execute = execute;
-                _stage = Stage.Given;
-                _steps = new Dictionary<Stage, List<Expression<Action<TSpec>>>>();
-                foreach (var stage in Enum.GetValues(typeof (Stage)).Cast<Stage>())
+                if (execute == null)
                 {
-                    _steps.Add(stage, new List<Expression<Action<TSpec>>>());
+                    throw new ArgumentNullException(nameof(execute));
                 }
+                this.execute = execute;
+                this.stage = Stage.Given;
+                this.steps = new ScenarioSteps<TSpec>();
             }
-
-            internal IReadOnlyCollection<Expression<Action<TSpec>>> Steps
-                => _steps.SelectMany(x => x.Value).ToList().AsReadOnly();
 
             public Scenario<TSpec> Given(Expression<Action<TSpec>> expression)
             {
@@ -88,36 +70,61 @@ namespace NBDD.V2
 
             public Scenario<TSpec> When(Expression<Action<TSpec>> expression)
             {
-                if (_stage == Stage.Given) _stage = Stage.When;
+                if (stage == Stage.Given)
+                {
+                    stage = Stage.When;
+                }
                 Append(Stage.When, expression);
                 return this;
             }
 
             public Scenario<TSpec> Then(Expression<Action<TSpec>> expression)
             {
-                if (_stage == Stage.When) _stage = Stage.Then;
+                if (stage == Stage.When)
+                {
+                    stage = Stage.Then;
+                }
                 Append(Stage.Then, expression);
                 return this;
             }
 
             public Scenario<TSpec> And(Expression<Action<TSpec>> expression)
             {
-                Append(_stage, expression);
+                Append(stage, expression);
                 return this;
             }
 
-            public void Execute()
-            {
-                _execute(this);
-            }
+            public void Execute() => execute(steps);
 
             private void Append(Stage stage, Expression<Action<TSpec>> expression)
             {
-                if (_stage != stage)
+                if (this.stage != stage)
                 {
                     throw new NotSupportedException(
                         @"The scenario steps should be ordered in the following order: Given, When, Then.");
                 }
+                steps.Append(stage, expression);
+            }
+        }
+
+        [DebuggerDisplay("Steps: {Steps.Count}")]
+        internal sealed class ScenarioSteps<TSpec>
+        {
+            private readonly Dictionary<Stage, List<ScenarioStep<TSpec>>> steps;
+
+            public ScenarioSteps()
+            {
+                this.steps = new Dictionary<Stage, List<ScenarioStep<TSpec>>>();
+                foreach (var stage in EnumX.GetValues<Stage>())
+                {
+                    steps.Add(stage, new List<ScenarioStep<TSpec>>());
+                }
+            }
+            internal IReadOnlyCollection<ScenarioStep<TSpec>> Steps
+                => steps.SelectMany(x => x.Value).ToList().AsReadOnly();
+
+            public void Append(Stage stage, Expression<Action<TSpec>> expression)
+            {
                 var methodCallExpression = expression.Body as MethodCallExpression;
                 if (methodCallExpression == null)
                 {
@@ -133,8 +140,27 @@ namespace NBDD.V2
                 {
                     throw new NotSupportedException(@"The scenario step should have the same stage as in spec.");
                 }
-                _steps[stage].Add(expression);
+                steps[stage].Add(new ScenarioStep<TSpec>(expression));
             }
         }
+
+        [DebuggerDisplay("Step: {Title}")]
+        internal sealed class ScenarioStep<TSpec>
+        {
+            public ScenarioStep(Expression<Action<TSpec>> expression)
+            {
+                Expression = expression;
+            }
+
+            public Expression<Action<TSpec>> Expression { get; private set; }
+            public string Title { get; }
+            public Action Action { get; }
+        }
+    }
+
+    internal static class EnumX
+    {
+        public static T Parse<T>(string value) => (T) Enum.Parse(typeof (T), value, true);
+        public static IEnumerable<T> GetValues<T>() => Enum.GetValues(typeof (T)).OfType<T>();
     }
 }
