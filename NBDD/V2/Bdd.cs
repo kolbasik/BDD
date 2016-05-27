@@ -73,9 +73,10 @@ namespace NBDD.V2
 
         internal List<Step> Steps { get; }
 
-        public void Step(string title, Func<Task> action)
+        public Scenario Step(string title, Func<Task> action)
         {
             Steps.Add(new Step(title, action));
+            return this;
         }
     }
 
