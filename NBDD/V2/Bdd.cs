@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
@@ -40,6 +41,11 @@ namespace NBDD.V2
 
         public void Play()
         {
+            PlayAsync().GetAwaiter().GetResult();
+        }
+
+        public async Task PlayAsync()
+        {
             Trace.WriteLine("Feature:");
             Trace.WriteLine('\t' + "As a " + AsA);
             Trace.WriteLine('\t' + "I want " + IWant);
@@ -51,7 +57,7 @@ namespace NBDD.V2
                 foreach (var step in scenario.Steps)
                 {
                     Trace.WriteLine('\t' + step.Title);
-                    step.Action.Invoke();
+                    await step.Action.Invoke().ConfigureAwait(false);
                 }
             }
         }
@@ -67,7 +73,7 @@ namespace NBDD.V2
 
         internal List<Step> Steps { get; }
 
-        public void Step(string title, Action action)
+        public void Step(string title, Func<Task> action)
         {
             Steps.Add(new Step(title, action));
         }
@@ -76,14 +82,14 @@ namespace NBDD.V2
     [DebuggerDisplay("Step: {Title}")]
     internal sealed class Step
     {
-        public Step(string title, Action action)
+        public Step(string title, Func<Task> action)
         {
             Title = title;
             Action = action;
         }
 
         public string Title { get; }
-        public Action Action { get; }
+        public Func<Task> Action { get; }
     }
 
     public class Component<TComponent> where TComponent : class, new()
@@ -97,39 +103,39 @@ namespace NBDD.V2
         internal Scenario Scenario { get; }
         internal TComponent Instance { get; }
 
-        public Component<TComponent> Given(string title, Action<TComponent> action)
+        public Component<TComponent> Given(string title, Func<TComponent, Task> action)
         {
-            Step(title, action);
-            return this;
+            return Step(title, action);
         }
 
-        public Component<TComponent> When(string title, Action<TComponent> action)
+        public Component<TComponent> When(string title, Func<TComponent, Task> action)
         {
-            Step(title, action);
-            return this;
+            return Step(title, action);
         }
 
-        public Component<TComponent> Then(string title, Action<TComponent> action)
+        public Component<TComponent> Then(string title, Func<TComponent, Task> action)
         {
-            Step(title, action);
-            return this;
+            return Step(title, action);
         }
 
-        public Component<TComponent> And(string title, Action<TComponent> action)
+        public Component<TComponent> And(string title, Func<TComponent, Task> action)
         {
-            Step(title, action);
-            return this;
+            return Step(title, action);
         }
 
-        internal void Step(string title, Action<TComponent> action)
+        internal Component<TComponent> Step(string title, Func<TComponent, Task> action)
         {
             Scenario.Step(title, () => action(Instance));
+            return this;
         }
     }
 
     public static class ComponentExtensions
     {
-        public static Component<TComponent> Use<TComponent>(this Scenario scenario) where TComponent : class, new()
+        private static readonly Task Done = Task.FromResult(true);
+
+        public static Component<TComponent> Use<TComponent>(this Scenario scenario)
+            where TComponent : class, new()
         {
             return new Component<TComponent>(scenario);
         }
@@ -139,6 +145,40 @@ namespace NBDD.V2
             where TComponentNew : class, new()
         {
             return new Component<TComponentNew>(componentOld.Scenario);
+        }
+
+        public static Component<TComponent> Given<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class, new()
+        {
+            return component.Step(title, action);
+        }
+
+        public static Component<TComponent> When<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class, new()
+        {
+            return component.Step(title, action);
+        }
+
+        public static Component<TComponent> Then<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class, new()
+        {
+            return component.Step(title, action);
+        }
+
+        public static Component<TComponent> And<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class, new()
+        {
+            return component.Step(title, action);
+        }
+
+        private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class, new()
+        {
+            return component.Step(title, instance =>
+            {
+                action(instance);
+                return Done;
+            });
         }
     }
 }
