@@ -6,130 +6,139 @@ namespace NBDD.V2
 {
     public static class Bdd
     {
-        public static FeatureSpec Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
+        public static Feature Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
         {
-            return new FeatureSpec(AsA, IWant, SoThat);
+            return new Feature { AsA = AsA, IWant = IWant, SoThat = SoThat };
+        }
+    }
+
+    public sealed class Feature
+    {
+        public Feature()
+        {
+            Scenarios = new List<Scenario>();
         }
 
-        public sealed class FeatureSpec
+        public string AsA { get; set; }
+        public string IWant { get; set; }
+        public string SoThat { get; set; }
+
+        internal List<Scenario> Scenarios { get; }
+
+        public Scenario Scenario()
         {
-            public FeatureSpec(string asA, string iWant, string soThat)
+            var scenario = new Scenario();
+            Scenarios.Add(scenario);
+            return scenario;
+        }
+
+        public Feature Describe(Action<Feature> describe)
+        {
+            describe(this);
+            return this;
+        }
+
+        public void Play()
+        {
+            Trace.WriteLine("Feature:");
+            Trace.WriteLine('\t' + "As a " + AsA);
+            Trace.WriteLine('\t' + "I want " + IWant);
+            Trace.WriteLine('\t' + "So that " + SoThat);
+
+            foreach (var scenario in Scenarios)
             {
-                AsA = asA;
-                IWant = iWant;
-                SoThat = soThat;
-                Scenarios = new List<ScenarioSpec>();
-            }
-
-            public string AsA { get; }
-            public string IWant { get; }
-            public string SoThat { get; }
-
-            internal List<ScenarioSpec> Scenarios { get; }
-
-            public ScenarioSpec<TSpec> Scenario<TSpec>() where TSpec : class, new()
-            {
-                return Scenario(new TSpec());
-            }
-
-            public ScenarioSpec<TSpec> Scenario<TSpec>(TSpec spec) where TSpec : class
-            {
-                var scenario = new ScenarioSpec<TSpec>(spec);
-                Scenarios.Add(scenario);
-                return scenario;
-            }
-
-            public void Execute(Action<FeatureSpec> configure)
-            {
-                Trace.WriteLine("Feature:");
-                Trace.WriteLine('\t' + "As a " + AsA);
-                Trace.WriteLine('\t' + "I want " + IWant);
-                Trace.WriteLine('\t' + "So that " + SoThat);
-
-                configure(this);
-
-                foreach (var scenario in Scenarios)
+                Trace.WriteLine($"{Environment.NewLine}Scenario:");
+                foreach (var step in scenario.Steps)
                 {
-                    Trace.WriteLine($"{Environment.NewLine}Scenario:");
-                    foreach (var step in scenario.Steps)
-                    {
-                        Trace.WriteLine('\t' + step.Title);
-                        step.Action.Invoke();
-                    }
+                    Trace.WriteLine('\t' + step.Title);
+                    step.Action.Invoke();
                 }
             }
         }
+    }
 
-        [DebuggerDisplay("Steps: {steps.Count}")]
-        public class ScenarioSpec
+    [DebuggerDisplay("Steps: {Steps.Count}")]
+    public class Scenario
+    {
+        public Scenario()
         {
-            protected ScenarioSpec()
-            {
-                this.Steps = new List<ScenarioStep>();
-            }
-
-            internal List<ScenarioStep> Steps { get; }
-
-            protected void Step(string title, Action action)
-            {
-                this.Steps.Add(new ScenarioStep(title, action));
-            }
+            Steps = new List<Step>();
         }
 
-        public class ScenarioSpec<TSpec> : ScenarioSpec where TSpec : class
+        internal List<Step> Steps { get; }
+
+        public void Step(string title, Action action)
         {
-            private readonly TSpec spec;
+            Steps.Add(new Step(title, action));
+        }
+    }
 
-            public ScenarioSpec(TSpec spec)
-            {
-                if (spec == null)
-                {
-                    throw new ArgumentNullException(nameof(spec));
-                }
-                this.spec = spec;
-            }
-
-            public ScenarioSpec<TSpec> Given(string title, Action<TSpec> action)
-            {
-                Step(title, action);
-                return this;
-            }
-
-            public ScenarioSpec<TSpec> When(string title, Action<TSpec> action)
-            {
-                Step(title, action);
-                return this;
-            }
-
-            public ScenarioSpec<TSpec> Then(string title, Action<TSpec> action)
-            {
-                Step(title, action);
-                return this;
-            }
-
-            public ScenarioSpec<TSpec> And(string title, Action<TSpec> action)
-            {
-                Step(title, action);
-                return this;
-            }
-
-            protected void Step(string title, Action<TSpec> action)
-            {
-                Step(title, () => action(this.spec));
-            }
+    [DebuggerDisplay("Step: {Title}")]
+    internal sealed class Step
+    {
+        public Step(string title, Action action)
+        {
+            Title = title;
+            Action = action;
         }
 
-        [DebuggerDisplay("Step: {Title}")]
-        internal sealed class ScenarioStep
-        {
-            public ScenarioStep(string title, Action action)
-            {
-                Title = title;
-                Action = action;
-            }
+        public string Title { get; }
+        public Action Action { get; }
+    }
 
-            public string Title { get; }
-            public Action Action { get; }
+    public class Component<TComponent> where TComponent : class, new()
+    {
+        public Component(Scenario scenario)
+        {
+            Scenario = scenario;
+            Instance = new TComponent();
+        }
+
+        internal Scenario Scenario { get; }
+        internal TComponent Instance { get; }
+
+        public Component<TComponent> Given(string title, Action<TComponent> action)
+        {
+            Step(title, action);
+            return this;
+        }
+
+        public Component<TComponent> When(string title, Action<TComponent> action)
+        {
+            Step(title, action);
+            return this;
+        }
+
+        public Component<TComponent> Then(string title, Action<TComponent> action)
+        {
+            Step(title, action);
+            return this;
+        }
+
+        public Component<TComponent> And(string title, Action<TComponent> action)
+        {
+            Step(title, action);
+            return this;
+        }
+
+        internal void Step(string title, Action<TComponent> action)
+        {
+            Scenario.Step(title, () => action(Instance));
+        }
+    }
+
+    public static class ComponentExtensions
+    {
+        public static Component<TComponent> Use<TComponent>(this Scenario scenario) where TComponent : class, new()
+        {
+            return new Component<TComponent>(scenario);
+        }
+
+        public static Component<TComponentNew> Use<TComponentOld, TComponentNew>(this Component<TComponentOld> componentOld)
+            where TComponentOld : class, new()
+            where TComponentNew : class, new()
+        {
+            return new Component<TComponentNew>(componentOld.Scenario);
         }
     }
 }
