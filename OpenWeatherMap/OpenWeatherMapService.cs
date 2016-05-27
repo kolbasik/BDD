@@ -10,20 +10,11 @@ namespace OpenWeatherMap
 {
     public sealed class OpenWeatherMapService : IDisposable
     {
-        public static OpenWeatherMapService Create()
+        public OpenWeatherMapService(OpenWeatherMapConfig config)
         {
-            return new OpenWeatherMapService(
-                new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute),
-                @"077cc5480d6fd71002f3999f7b04218c");
-        }
-
-        public OpenWeatherMapService(Uri serviceUri, string appId)
-        {
-            if (serviceUri == null) throw new ArgumentNullException(nameof(serviceUri));
-            if (appId == null) throw new ArgumentNullException(nameof(appId));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             HttpClient = new HttpClient();
-            ServiceUri = serviceUri;
-            AppId = appId;
+            Config = config;
         }
 
         public void Dispose()
@@ -31,9 +22,9 @@ namespace OpenWeatherMap
             HttpClient.Dispose();
         }
 
-        public HttpClient HttpClient { get; private set; }
-        public Uri ServiceUri { get; private set; }
-        public string AppId { get; private set; }
+        public HttpClient HttpClient { get; }
+        public OpenWeatherMapConfig Config { get; }
+
 
         public Task<OpenWeatherMapResult> GetWeatherForecastAsync(string city, string country)
         {
@@ -66,8 +57,8 @@ namespace OpenWeatherMap
 
         private Uri GetResource(Dictionary<string, string> parameters)
         {
-            parameters = new Dictionary<string, string>(parameters) { { @"appid", AppId } };
-            var resource = new UriBuilder(ServiceUri)
+            parameters = new Dictionary<string, string>(parameters) { { @"appid", Config.AppId } };
+            var resource = new UriBuilder(Config.ServiceUri)
             {
                 Query = string.Join(@"&", parameters.Select(x => $"{x.Key}={x.Value}"))
             };

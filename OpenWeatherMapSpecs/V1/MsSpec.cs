@@ -25,7 +25,7 @@ namespace OpenWeatherMapSpecs.V1
 
         protected OpenWeatherMapServiceSpec()
         {
-            OpenWeatherMapService = OpenWeatherMapService.Create();
+            OpenWeatherMapService = new OpenWeatherMapService(OpenWeatherMapConfig.Test());
         }
 
         public void Dispose()

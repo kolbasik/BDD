@@ -1,165 +1,121 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace NBDD.V2
 {
     public static class Bdd
     {
-        public enum Stage
+        public static FeatureSpec Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
         {
-            Given,
-            When,
-            Then
+            return new FeatureSpec(AsA, IWant, SoThat);
         }
 
-        public static Scenario<TSpec> Scen<TSpec>() where TSpec : new()
+        public sealed class FeatureSpec
         {
-            return Scen(new TSpec());
-        }
+            public FeatureSpec(string asA, string iWant, string soThat)
+            {
+                AsA = asA;
+                IWant = iWant;
+                SoThat = soThat;
+                Scenarios = new List<ScenarioSpec>();
+            }
 
-        public static Scenario<TSpec> Scen<TSpec>(TSpec spec)
-        {
-            return new Scenario<TSpec>(spec,
-                delegate(ScenarioSteps x)
+            public string AsA { get; }
+            public string IWant { get; }
+            public string SoThat { get; }
+
+            internal List<ScenarioSpec> Scenarios { get; }
+
+            public ScenarioSpec<TSpec> Scenario<TSpec>() where TSpec : class, new()
+            {
+                return Scenario(new TSpec());
+            }
+
+            public ScenarioSpec<TSpec> Scenario<TSpec>(TSpec spec) where TSpec : class
+            {
+                var scenario = new ScenarioSpec<TSpec>(spec);
+                Scenarios.Add(scenario);
+                return scenario;
+            }
+
+            public void Execute(Action<FeatureSpec> configure)
+            {
+                Trace.WriteLine("Feature:");
+                Trace.WriteLine('\t' + "As a " + AsA);
+                Trace.WriteLine('\t' + "I want " + IWant);
+                Trace.WriteLine('\t' + "So that " + SoThat);
+
+                configure(this);
+
+                foreach (var scenario in Scenarios)
                 {
-                    Trace.WriteLine(x.Steps.Count);
-                    foreach (var step in x.Steps)
+                    Trace.WriteLine($"{Environment.NewLine}Scenario:");
+                    foreach (var step in scenario.Steps)
                     {
-                        Trace.WriteLine(step.Title);
+                        Trace.WriteLine('\t' + step.Title);
                         step.Action.Invoke();
                     }
-                });
+                }
+            }
         }
 
-        [AttributeUsage(AttributeTargets.Method)]
-        public abstract class StepAttribute : Attribute
+        [DebuggerDisplay("Steps: {steps.Count}")]
+        public class ScenarioSpec
         {
-            public Stage Stage => EnumX.Parse<Stage>(GetType().Name.Replace(@"Attribute", string.Empty));
-            public string Title { get; set; }
+            protected ScenarioSpec()
+            {
+                this.Steps = new List<ScenarioStep>();
+            }
+
+            internal List<ScenarioStep> Steps { get; }
+
+            protected void Step(string title, Action action)
+            {
+                this.Steps.Add(new ScenarioStep(title, action));
+            }
         }
 
-        public sealed class GivenAttribute : StepAttribute
-        {
-        }
-
-        public sealed class WhenAttribute : StepAttribute
-        {
-        }
-
-        public sealed class ThenAttribute : StepAttribute
-        {
-        }
-
-        public sealed class Scenario<TSpec>
+        public class ScenarioSpec<TSpec> : ScenarioSpec where TSpec : class
         {
             private readonly TSpec spec;
-            private readonly Action<ScenarioSteps> execute;
-            private readonly ScenarioSteps steps;
-            private Stage stage;
 
-            internal Scenario(TSpec spec, Action<ScenarioSteps> execute)
+            public ScenarioSpec(TSpec spec)
             {
                 if (spec == null)
                 {
                     throw new ArgumentNullException(nameof(spec));
                 }
-                if (execute == null)
-                {
-                    throw new ArgumentNullException(nameof(execute));
-                }
                 this.spec = spec;
-                this.execute = execute;
-                this.stage = Stage.Given;
-                this.steps = new ScenarioSteps();
             }
 
-            public Scenario<TSpec> Given(Expression<Action<TSpec>> expression)
+            public ScenarioSpec<TSpec> Given(string title, Action<TSpec> action)
             {
-                Append(Stage.Given, expression);
+                Step(title, action);
                 return this;
             }
 
-            public Scenario<TSpec> When(Expression<Action<TSpec>> expression)
+            public ScenarioSpec<TSpec> When(string title, Action<TSpec> action)
             {
-                if (stage == Stage.Given)
-                {
-                    stage = Stage.When;
-                }
-                Append(Stage.When, expression);
+                Step(title, action);
                 return this;
             }
 
-            public Scenario<TSpec> Then(Expression<Action<TSpec>> expression)
+            public ScenarioSpec<TSpec> Then(string title, Action<TSpec> action)
             {
-                if (stage == Stage.When)
-                {
-                    stage = Stage.Then;
-                }
-                Append(Stage.Then, expression);
+                Step(title, action);
                 return this;
             }
 
-            public Scenario<TSpec> And(Expression<Action<TSpec>> expression)
+            public ScenarioSpec<TSpec> And(string title, Action<TSpec> action)
             {
-                Append(stage, expression);
+                Step(title, action);
                 return this;
             }
 
-            public void Execute() => execute(steps);
-
-            private void Append(Stage stage, Expression<Action<TSpec>> expression)
+            protected void Step(string title, Action<TSpec> action)
             {
-                if (this.stage != stage)
-                {
-                    throw new NotSupportedException(
-                        @"The scenario steps should be ordered in the following order: Given, When, Then.");
-                }
-
-                var title = StepUtils.GetTitle(expression);
-                var action = StepUtils.GetAction(spec, expression);
-
-                steps.Append(stage, title, action);
-            }
-        }
-
-        [DebuggerDisplay("Steps: {Steps.Count}")]
-        internal sealed class ScenarioSteps
-        {
-            private readonly Dictionary<Stage, List<ScenarioStep>> steps;
-
-            public ScenarioSteps()
-            {
-                this.steps = new Dictionary<Stage, List<ScenarioStep>>();
-                foreach (var stage in EnumX.GetValues<Stage>())
-                {
-                    steps.Add(stage, new List<ScenarioStep>());
-                }
-            }
-            internal IReadOnlyCollection<ScenarioStep> Steps
-                => steps.SelectMany(x => x.Value).ToList().AsReadOnly();
-
-            public void Append(Stage stage, string title, Action action)
-            {
-                //var methodCallExpression = expression.Body as MethodCallExpression;
-                //if (methodCallExpression == null)
-                //{
-                //    throw new NotSupportedException(@"The scenario step should be as a single method call.");
-                //}
-                //var stepAttribute = methodCallExpression.Method.GetCustomAttribute<StepAttribute>();
-                //if (stepAttribute == null)
-                //{
-                //    throw new NotSupportedException(
-                //        @"The spec step should be defined with one of Given, When or Then attribute.");
-                //}
-                //if (stepAttribute.Stage != stage)
-                //{
-                //    throw new NotSupportedException(@"The scenario step should have the same stage as in spec.");
-                //}
-                steps[stage].Add(new ScenarioStep(title, action));
+                Step(title, () => action(this.spec));
             }
         }
 
@@ -175,31 +131,5 @@ namespace NBDD.V2
             public string Title { get; }
             public Action Action { get; }
         }
-
-        internal static class StepUtils
-        {
-            public static string GetTitle<T>(Expression<Action<T>> expression)
-            {
-                var methodCallExpression = expression.Body as MethodCallExpression;
-                var stepAttribute = methodCallExpression?.Method.GetCustomAttribute<StepAttribute>();
-                if (!string.IsNullOrWhiteSpace(stepAttribute?.Title))
-                {
-                    return stepAttribute.Title;
-                }
-                return methodCallExpression?.Method.Name.Replace("__", "_$").Replace("_", " ");
-            }
-
-            public static Action GetAction<T>(T target, Expression<Action<T>> expression)
-            {
-                var action = expression.Compile();
-                return () => action.Invoke(target);
-            }
-        }
-    }
-
-    internal static class EnumX
-    {
-        public static T Parse<T>(string value) => (T) Enum.Parse(typeof (T), value, true);
-        public static IEnumerable<T> GetValues<T>() => Enum.GetValues(typeof (T)).OfType<T>();
     }
 }
