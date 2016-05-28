@@ -44,24 +44,24 @@ namespace NBDD.V2
         }
 
         [DebuggerHidden, DebuggerStepThrough]
-        public FeatureResult Play()
+        public FeatureResult Play(Action<string> trace)
         {
-            return PlayAsync().GetAwaiter().GetResult();
+            return PlayAsync(trace).GetAwaiter().GetResult();
         }
 
         [DebuggerHidden, DebuggerStepThrough]
-        public async Task<FeatureResult> PlayAsync()
+        public async Task<FeatureResult> PlayAsync(Action<string> trace)
         {
-            Trace.WriteLine("Feature:");
-            Trace.WriteLine('\t' + "As a " + AsA);
-            Trace.WriteLine('\t' + "I want " + IWant);
-            Trace.WriteLine('\t' + "So that " + SoThat);
+            trace("Feature:");
+            trace('\t' + "As a " + AsA);
+            trace('\t' + "I want " + IWant);
+            trace('\t' + "So that " + SoThat);
 
             var featureResult = new FeatureResult(this);
             foreach (var scenario in Scenarios)
             {
                 var skip = false;
-                Trace.WriteLine($"{Environment.NewLine}Scenario:");
+                trace($"{Environment.NewLine}Scenario:");
                 var scenarioResult = new ScenarioResult(scenario);
                 foreach (var step in scenario.Steps)
                 {
@@ -87,10 +87,9 @@ namespace NBDD.V2
                             scenarioResult.Steps.Add(new StepResult(false, step.Title));
                         }
                     }
-                    Trace.WriteLine("\t" + scenarioResult.Steps.Last());
+                    trace("\t" + scenarioResult.Steps.Last());
                 }
-                Trace.WriteLine(string.Empty);
-                Trace.WriteLineIf(scenarioResult.Exception != null, scenarioResult.Exception);
+                trace($"{Environment.NewLine}{scenarioResult.Exception}");
                 featureResult.Scenarios.Add(scenarioResult);
             }
             return featureResult;
