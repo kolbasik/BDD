@@ -15,6 +15,14 @@ namespace NBDD.V2
         }
     }
 
+    public enum Stage
+    {
+        And,
+        Given,
+        When,
+        Then
+    }
+
     [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Feature
     {
@@ -87,7 +95,8 @@ namespace NBDD.V2
                             scenarioResult.Steps.Add(new StepResult(false, step.Title));
                         }
                     }
-                    trace("\t" + scenarioResult.Steps.Last());
+                    var stepResult = scenarioResult.Steps.Last();
+                    trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
                 }
                 trace($"{Environment.NewLine}{scenarioResult.Exception}");
                 featureResult.Scenarios.Add(scenarioResult);
@@ -107,9 +116,16 @@ namespace NBDD.V2
 
         internal List<Step> Steps { get; }
 
-        public Scenario Step(string title, Func<Task> action)
+        public Scenario Step(Stage stage, string title, Func<Task> action)
         {
-            Steps.Add(new Step(title, action));
+            const string space = @" ";
+            var display = stage.ToString();
+            if (stage == Stage.And)
+            {
+                display = space + display.ToLower();
+            }
+            display += space + title;
+            Steps.Add(new Step(display, action));
             return this;
         }
     }
@@ -142,28 +158,28 @@ namespace NBDD.V2
 
         public Component<TComponent> Given(string title, Func<TComponent, Task> action)
         {
-            return Step(@"Given " + title, action);
+            return Step(Stage.Given, title, action);
         }
 
         public Component<TComponent> When(string title, Func<TComponent, Task> action)
         {
-            return Step(@"When " + title, action);
+            return Step(Stage.When, title, action);
         }
 
         public Component<TComponent> Then(string title, Func<TComponent, Task> action)
         {
-            return Step(@"Then " + title, action);
+            return Step(Stage.Then, title, action);
         }
 
         public Component<TComponent> And(string title, Func<TComponent, Task> action)
         {
-            return Step(@" and " + title, action);
+            return Step(Stage.And, title, action);
         }
 
         [DebuggerHidden, DebuggerStepThrough]
-        internal Component<TComponent> Step(string title, Func<TComponent, Task> action)
+        internal Component<TComponent> Step(Stage stage, string title, Func<TComponent, Task> action)
         {
-            Scenario.Step(title, () => action(Instance));
+            Scenario.Step(stage, title, () => action(Instance));
             return this;
         }
     }
@@ -189,36 +205,36 @@ namespace NBDD.V2
         public static Component<TComponent> Given<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
-            return component.Step(@"Given " + title, action);
+            return component.Step(Stage.Given, title, action);
         }
 
         public static Component<TComponent> When<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
-            return component.Step(@"When " + title, action);
+            return component.Step(Stage.When, title, action);
         }
 
         public static Component<TComponent> Then<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
-            return component.Step(@"Then " + title, action);
+            return component.Step(Stage.Then, title, action);
         }
 
         public static Component<TComponent> And<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
-            return component.Step(@" and " + title, action);
+            return component.Step(Stage.And, title, action);
         }
 
         [DebuggerHidden, DebuggerStepThrough]
-        private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+        private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, Stage stage, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
-            return component.Step(title, (instance =>
+            return component.Step(stage, title, instance =>
             {
                 action(instance);
                 return Done;
-            }));
+            });
         }
     }
 
@@ -260,7 +276,5 @@ namespace NBDD.V2
 
         public bool? Success { get; }
         public string Name { get; }
-
-        public override string ToString() => Name + (Success.HasValue ? (Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty);
     }
 }
