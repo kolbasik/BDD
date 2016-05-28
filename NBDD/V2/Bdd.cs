@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -24,11 +26,18 @@ namespace NBDD.V2
     }
 
     [DebuggerStepThrough, DebuggerNonUserCode]
-    public sealed class Feature
+    public sealed class Feature : IDisposable
     {
         public Feature()
         {
             Scenarios = new List<Scenario>();
+            Container = new CompositionContainer(new ApplicationCatalog());
+        }
+
+        public void Dispose()
+        {
+            Scenarios.ForEach(x => x.Dispose());
+            Container.Dispose();
         }
 
         public string AsA { get; set; }
@@ -36,10 +45,11 @@ namespace NBDD.V2
         public string SoThat { get; set; }
 
         internal List<Scenario> Scenarios { get; }
+        public CompositionContainer Container { get; }
 
         public Scenario Scenario()
         {
-            var scenario = new Scenario();
+            var scenario = new Scenario(this);
             Scenarios.Add(scenario);
             return scenario;
         }
@@ -61,60 +71,76 @@ namespace NBDD.V2
         public async Task<FeatureResult> PlayAsync(Action<string> trace)
         {
             trace("Feature:");
-            trace('\t' + "As a " + AsA);
-            trace('\t' + "I want " + IWant);
-            trace('\t' + "So that " + SoThat);
+            trace("\tAs a " + AsA);
+            trace("\tI want " + IWant);
+            trace("\tSo that " + SoThat);
 
-            var featureResult = new FeatureResult(this);
-            foreach (var scenario in Scenarios)
+            using (this)
             {
-                var skip = false;
-                trace($"{Environment.NewLine}Scenario:");
-                var scenarioResult = new ScenarioResult(scenario);
-                foreach (var step in scenario.Steps)
+                var featureResult = new FeatureResult(this);
+                foreach (var scenario in Scenarios)
                 {
-                    if (skip)
+                    using (scenario)
                     {
-                        scenarioResult.Steps.Add(new StepResult(null, step.Title));
-                    }
-                    else
-                    {
-                        try
+                        var skip = false;
+                        trace($"{Environment.NewLine}Scenario:");
+                        var scenarioResult = new ScenarioResult(scenario);
+                        foreach (var step in scenario.Steps)
                         {
-                            await step.Action.Invoke().ConfigureAwait(false);
-                            scenarioResult.Steps.Add(new StepResult(true, step.Title));
-                        }
-                        catch (Exception ex)
-                        {
-                            skip = true;
-                            if (ex is TargetInvocationException)
+                            if (skip)
                             {
-                                ex = ex.InnerException;
+                                scenarioResult.Steps.Add(new StepResult(null, step.Title));
                             }
-                            scenarioResult.Exception = ex;
-                            scenarioResult.Steps.Add(new StepResult(false, step.Title));
+                            else
+                            {
+                                try
+                                {
+                                    await step.Action.Invoke().ConfigureAwait(false);
+                                    scenarioResult.Steps.Add(new StepResult(true, step.Title));
+                                }
+                                catch (Exception ex)
+                                {
+                                    skip = true;
+                                    if (ex is TargetInvocationException)
+                                    {
+                                        ex = ex.InnerException;
+                                    }
+                                    scenarioResult.Exception = ex;
+                                    scenarioResult.Steps.Add(new StepResult(false, step.Title));
+                                }
+                            }
+                            var stepResult = scenarioResult.Steps.Last();
+                            trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
                         }
+                        trace($"{Environment.NewLine}{scenarioResult.Exception}");
+                        featureResult.Scenarios.Add(scenarioResult);
                     }
-                    var stepResult = scenarioResult.Steps.Last();
-                    trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
                 }
-                trace($"{Environment.NewLine}{scenarioResult.Exception}");
-                featureResult.Scenarios.Add(scenarioResult);
+                return featureResult;
             }
-            return featureResult;
         }
     }
 
     [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Scenario: steps={Steps.Count}")]
-    public class Scenario
+    public class Scenario : IDisposable
     {
-        public Scenario()
+        public Scenario(Feature feature)
         {
             Steps = new List<Step>();
+            Container = new CompositionContainer(feature.Container);
+            Components = new List<IDisposable>();
+        }
+
+        public void Dispose()
+        {
+            Components.ForEach(x => x.Dispose());
+            Container.Dispose();
         }
 
         internal List<Step> Steps { get; }
+        public CompositionContainer Container { get; }
+        internal List<IDisposable> Components { get; }
 
         public Scenario Step(Stage stage, string title, Func<Task> action)
         {
@@ -145,12 +171,20 @@ namespace NBDD.V2
     }
 
     [DebuggerStepThrough, DebuggerNonUserCode]
-    public class Component<TComponent> where TComponent : class, new()
+    public class Component<TComponent> : IDisposable where TComponent : class, new()
     {
         public Component(Scenario scenario)
         {
             Scenario = scenario;
             Instance = new TComponent();
+            Scenario.Container.ComposeParts(Instance);
+            Scenario.Components.Add(this);
+        }
+
+        public void Dispose()
+        {
+            var disposable = Instance as IDisposable;
+            disposable?.Dispose();
         }
 
         internal Scenario Scenario { get; }
