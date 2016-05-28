@@ -9,7 +9,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
 
         protected OpenWeatherMapServiceSpec()
         {
-            OpenWeatherMapService = new OpenWeatherMapService(OpenWeatherMapConfig.Test());
+            OpenWeatherMapService = new OpenWeatherMapService(OpenWeatherMapConfig.FromConfig());
         }
 
         public void Dispose()

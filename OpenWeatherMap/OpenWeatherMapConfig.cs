@@ -18,11 +18,7 @@ namespace OpenWeatherMap
 
         public static OpenWeatherMapConfig FromConfig()
         {
-            return new OpenWeatherMapConfig(new Uri(ConfigurationManager.AppSettings.Get("OpenWeatherMap:ServiceUri"), UriKind.Absolute), ConfigurationManager.AppSettings.Get("OpenWeatherMap:AppId"));
-        }
-        public static OpenWeatherMapConfig Test()
-        {
-            return new OpenWeatherMapConfig(new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute), @"077cc5480d6fd71002f3999f7b04218c");
+            return new OpenWeatherMapConfig(new Uri(ConfigurationManager.AppSettings.Get(@"OpenWeatherMap:ServiceUri"), UriKind.Absolute), ConfigurationManager.AppSettings.Get(@"OpenWeatherMap:AppId"));
         }
     }
 }
