@@ -18,6 +18,7 @@ namespace OpenWeatherMapSpecs.V2
 
         [Theory]
         [InlineData(@"London", @"UK")]
+        [InlineData(@"Paris", @"FR")]
         [InlineData(@"Kyiv", @"UA")]
         public Task Test(string cityName, string countryCode)
         {

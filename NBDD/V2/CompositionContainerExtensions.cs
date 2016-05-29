@@ -22,9 +22,14 @@ namespace NBDD.V2
             return container.GetExportedValue<TService>(contractName);
         }
 
-        public static TService Resolve<TService>(this CompositionContainer container) where TService : class
+        public static TService Resolve<TService>(this CompositionContainer container)
         {
-            return container.GetExportedValueOrDefault<TService>() ?? container.Resolve<TService>(nameof(Bdd));
+            var service = container.GetExportedValueOrDefault<TService>();
+            if (object.Equals(service, default(TService)))
+            {
+                return container.Resolve<TService>(nameof(Bdd));
+            }
+            return service;
         }
 
         public static CompositionContainer Scope(this CompositionContainer parent)

@@ -16,7 +16,7 @@ namespace NBDD.V2
         public abstract void Dispose();
     }
 
-    public class Component<TComponent> : Component where TComponent : class
+    public class Component<TComponent> : Component
     {
         public Component(Scenario scenario) : base(scenario)
         {
@@ -54,15 +54,15 @@ namespace NBDD.V2
             return Step(StepType.And, title, action);
         }
 
-        internal Component<TComponent> Bind(Func<TComponent, Scenario, Task> bind)
-        {
-            Scenario.Bind(bind.Bind(Instance));
-            return this;
-        }
-
         internal Component<TComponent> Step(StepType stepType, string title, Func<TComponent, Scenario, Task> action)
         {
             Scenario.Step(stepType, title, action.Bind(Instance).Bind(Scenario));
+            return this;
+        }
+
+        internal Component<TComponent> Bind(Func<TComponent, Scenario, Task> bind)
+        {
+            Scenario.Bind(bind.Bind(Instance));
             return this;
         }
     }
