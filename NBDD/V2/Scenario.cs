@@ -11,10 +11,10 @@ namespace NBDD.V2
     {
         public Scenario(Feature feature)
         {
-            Props = new Dictionary<string, object>();
             Units = new List<Unit>();
             Components = new List<Component>();
             Container = feature.Container.Scope();
+            Props = new Dictionary<string, object>();
         }
 
         public void Dispose()
@@ -23,23 +23,20 @@ namespace NBDD.V2
             Container.Dispose();
         }
 
-        internal Dictionary<string, object> Props { get; }
         internal List<Unit> Units { get; }
         internal List<Component> Components { get; }
         public CompositionContainer Container { get; }
+        public Dictionary<string, object> Props { get; }
 
-        public Scenario Bind(string name, Func<Scenario, object> bind)
+        // TOSO: moved to extensions
+        public Scenario Bind(Action<Scenario> bind)
         {
-            return Bind(s =>
-            {
-                Props[name] = bind.Invoke(this);
-                return Bdd.Done;
-            });
+            return Bind(bind.AsAsync());
         }
 
         public Scenario Bind(Func<Scenario, Task> bind)
         {
-            Units.Add(new Bind(() => bind.Invoke(this)));
+            Units.Add(new Bind(bind.Bind(this)));
             return this;
         }
 

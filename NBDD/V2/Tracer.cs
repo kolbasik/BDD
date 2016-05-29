@@ -4,13 +4,13 @@ namespace NBDD.V2
 {
     public sealed class Tracer
     {
-        private readonly Action<string> _trace;
+        private readonly Action<string> trace;
 
         public Tracer(Action<string> trace)
         {
-            _trace = trace;
+            this.trace = trace;
         }
 
-        public void Trace(string message) => _trace.Invoke(message);
+        public void Trace(string message) => trace.Invoke(message);
     }
 }

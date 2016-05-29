@@ -49,6 +49,7 @@
     <Compile Include="V2\Component.cs" />
     <Compile Include="V2\ComponentExtensions.cs" />
     <Compile Include="V2\CompositionContainerExtensions.cs" />
+    <Compile Include="V2\F.cs" />
     <Compile Include="V2\Feature.cs" />
     <Compile Include="V2\FeatureExtensions.cs" />
     <Compile Include="V2\FeatureResult.cs" />

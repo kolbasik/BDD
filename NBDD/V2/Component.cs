@@ -36,27 +36,27 @@ namespace NBDD.V2
 
         public Component<TComponent> Given(string title, Func<Scenario, TComponent, Task> action)
         {
-            return Step(StepType.Given, title, component => action(Scenario, component));
+            return Step(StepType.Given, title, action);
         }
 
-        public Component<TComponent> When(string title, Func<TComponent, Task> action)
+        public Component<TComponent> When(string title, Func<Scenario, TComponent, Task> action)
         {
             return Step(StepType.When, title, action);
         }
 
-        public Component<TComponent> Then(string title, Func<TComponent, Task> action)
+        public Component<TComponent> Then(string title, Func<Scenario, TComponent, Task> action)
         {
             return Step(StepType.Then, title, action);
         }
 
-        public Component<TComponent> And(string title, Func<TComponent, Task> action)
+        public Component<TComponent> And(string title, Func<Scenario, TComponent, Task> action)
         {
             return Step(StepType.And, title, action);
         }
 
-        internal Component<TComponent> Step(StepType stepType, string title, Func<TComponent, Task> action)
+        internal Component<TComponent> Step(StepType stepType, string title, Func<Scenario, TComponent, Task> action)
         {
-            Scenario.Step(stepType, title, () => action(Instance.Value));
+            Scenario.Step(stepType, title, action.Bind(Scenario).Bind(Instance));
             return this;
         }
     }
