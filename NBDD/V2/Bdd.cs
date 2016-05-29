@@ -245,13 +245,17 @@ namespace NBDD.V2
         public static Feature UseBdd<TService>(this Feature feature)
         {
             var service = feature.Container.GetExportedValue<TService>(nameof(Bdd));
-            feature.Container.ComposeExportedValue(service);
-            return feature;
+            return feature.Use(service);
         }
 
         public static Feature UseTrace(this Feature feature, Action<string> trace)
         {
-            feature.Container.ComposeExportedValue(new Tracer(trace));
+            return feature.Use(new Tracer(trace));
+        }
+
+        public static Feature Use<TService>(this Feature feature, TService service)
+        {
+            feature.Container.ComposeExportedValue(service);
             return feature;
         }
     }

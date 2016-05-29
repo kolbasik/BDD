@@ -82,7 +82,6 @@
     <Compile Include="V1\MsSpec.cs" />
     <Compile Include="V2\GetTheWeatherByCityNameSpec.cs" />
     <Compile Include="V2\Specs\TheWeatherByCityNameSpec.cs" />
-    <Compile Include="V2\Specs\OpenWeatherMapServiceSpec.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NBDD\NBDD.csproj">
