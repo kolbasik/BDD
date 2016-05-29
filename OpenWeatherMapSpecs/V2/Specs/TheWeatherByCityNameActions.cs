@@ -22,14 +22,23 @@ namespace OpenWeatherMapSpecs.V2.Specs
             Assert.NotNull(Forecast);
         }
 
+        public void It_should_contain_the_city_id()
+        {
+            Assert.NotNull(Forecast.Id);
+        }
+
         public void It_should_contain_the_city_name()
         {
             Assert.Equal(CityName, Forecast.Name);
         }
 
-        public void It_should_contain_the_city_id()
+        public void It_should_contain_the_geographic_coordinates()
         {
-            Assert.NotNull(Forecast.Id);
+            Assert.NotNull(Forecast.Coord);
+        }
+
+        public void It_should_contain_the_country_code()
+        {
         }
     }
 }

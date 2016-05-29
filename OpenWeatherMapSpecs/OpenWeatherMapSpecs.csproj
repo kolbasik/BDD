@@ -81,11 +81,13 @@
     <Compile Include="V1\GetTheWeatherByGeographicCoordinatesSpec.cs" />
     <Compile Include="V1\MsSpec.cs" />
     <Compile Include="V2\OpenWeatherMapServiceTest.cs" />
+    <Compile Include="V2\Specs\TheWeatherByGeographicCoordinatesActions.cs" />
     <Compile Include="V2\Specs\TheWeatherByCityIDActions.cs" />
     <Compile Include="V2\TheWeatherByCityIDTest.cs" />
     <Compile Include="V2\TheWeatherByCityNameTest.cs" />
     <Compile Include="V2\Specs\TheWeatherByCityNameActions.cs" />
     <Compile Include="V2\Specs\TheWeatherForecastResultActions.cs" />
+    <Compile Include="V2\TheWeatherByGeographicCoordinatesTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NBDD\NBDD.csproj">

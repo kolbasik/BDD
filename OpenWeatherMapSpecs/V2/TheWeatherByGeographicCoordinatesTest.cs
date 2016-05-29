@@ -7,11 +7,11 @@ using Xunit.Abstractions;
 
 namespace OpenWeatherMapSpecs.V2
 {
-    public class TheWeatherByCityIDTest : OpenWeatherMapServiceTest
+    public class TheWeatherByGeographicCoordinatesTest : OpenWeatherMapServiceTest
     {
         private readonly ITestOutputHelper _output;
 
-        public TheWeatherByCityIDTest(ITestOutputHelper output)
+        public TheWeatherByGeographicCoordinatesTest(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -22,9 +22,9 @@ namespace OpenWeatherMapSpecs.V2
         public Task Test(string cityName, string countryCode)
         {
             return Bdd.Feature(
-                    AsA: @"developer",
-                    IWant: @"to get the weather forecast by city id",
-                    SoThat: @"he will be able to plan holidays.")
+                AsA: @"developer",
+                IWant: @"to get the weather forecast by geographic coordinates",
+                SoThat: @"he will be able to plan holidays.")
                 .UseTrace(_output.WriteLine)
                 .Use(OpenWeatherMapService)
                 .Describe(a =>
@@ -37,13 +37,15 @@ namespace OpenWeatherMapSpecs.V2
                         .Given(@"the city is $CityName", (x, s) => x.CityName = s.Prop<string>(@"CityName"))
                         .And(@"the country is $CountryCode", (x, s) => x.CountryCode = s.Prop<string>(@"CountryCode"))
                         .When(@"I have asked the forecast", (x, s) => x.When_I_have_asked_the_forecast())
-                        .Then(@"it should contain the city id", (x, s) => x.It_should_contain_the_city_id())
-                        .Bind((x, s) => s.Prop(@"CityID", x.Forecast.Id))
+                        .Then(@"it should contain the geographic coordinates", (x, s) => x.It_should_contain_the_geographic_coordinates())
+                        .Bind((x, s) => s.Prop(@"Lat", x.Forecast.Coord.Lat))
+                        .Bind((x, s) => s.Prop(@"Lon", x.Forecast.Coord.Lon))
 
-                        .Use<TheWeatherByCityIDActions>()
-                        .Given(@"the city is $CityID", (x, s) => x.CityID = s.Prop<string>(@"CityID"))
+                        .Use<TheWeatherByGeographicCoordinatesActions>()
+                        .Given(@"the geographic coordinates lat is $Lat", (x, s) => x.Lat = s.Prop<decimal>(@"Lat"))
+                        .And(@"the geographic coordinates lon is $Lon", (x, s) => x.Lon = s.Prop<decimal>(@"Lon"))
                         .When(@"I have asked the forecast", (x, s) => x.When_I_have_asked_the_forecast())
-                        .Then(@"it should contain the city id", (x, s) => x.It_should_contain_the_city_id())
+                        .Then(@"it should contain the city id", (x, s) => x.It_should_contain_the_geographic_coordinates())
                         .Bind((x, s) => s.Prop(@"Forecast", x.Forecast))
 
                         .Use<TheWeatherForecastResultActions>()
