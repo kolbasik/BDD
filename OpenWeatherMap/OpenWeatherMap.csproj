@@ -45,7 +45,7 @@
     <Compile Include="Data\Main.cs" />
     <Compile Include="Data\Weather.cs" />
     <Compile Include="OpenWeatherMapConfig.cs" />
-    <Compile Include="OpenWeatherMapResult.cs" />
+    <Compile Include="OpenWeatherMapForecast.cs" />
     <Compile Include="OpenWeatherMapService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

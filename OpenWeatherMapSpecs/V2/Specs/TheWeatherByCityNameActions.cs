@@ -14,7 +14,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
         public string CityName { get; set; }
         public string CountryCode { get; set; }
 
-        public OpenWeatherMapResult Forecast { get; private set; }
+        public OpenWeatherMapForecast Forecast { get; private set; }
 
         public async Task When_I_have_asked_the_forecast()
         {

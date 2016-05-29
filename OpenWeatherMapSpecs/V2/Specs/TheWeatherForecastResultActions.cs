@@ -7,8 +7,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
     [Export]
     public sealed class TheWeatherForecastResultActions
     {
-        [Import]
-        public OpenWeatherMapResult Forecast { get; set; }
+        public OpenWeatherMapForecast Forecast { get; set; }
 
         public void It_should_contain_the_coordinates()
         {

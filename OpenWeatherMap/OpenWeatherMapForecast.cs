@@ -2,7 +2,7 @@ using OpenWeatherMap.Data;
 
 namespace OpenWeatherMap
 {
-    public sealed class OpenWeatherMapResult
+    public sealed class OpenWeatherMapForecast
     {
         public string Id { get; set; }
         public string Name { get; set; }

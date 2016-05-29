@@ -26,19 +26,19 @@ namespace OpenWeatherMap
         public OpenWeatherMapConfig Config { get; }
 
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(string city, string country)
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(string city, string country)
         {
             var parameters = new Dictionary<string, string> { { "q", city + "," + country } };
             return ExecuteAsync(parameters);
         }
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(string id)
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(string id)
         {
             var parameters = new Dictionary<string, string> { { "id", id } };
             return ExecuteAsync(parameters);
         }
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(decimal lat, decimal lon)
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(decimal lat, decimal lon)
         {
             var parameters = new Dictionary<string, string>
             {
@@ -48,11 +48,11 @@ namespace OpenWeatherMap
             return ExecuteAsync(parameters);
         }
 
-        private async Task<OpenWeatherMapResult> ExecuteAsync(Dictionary<string, string> parameters)
+        private async Task<OpenWeatherMapForecast> ExecuteAsync(Dictionary<string, string> parameters)
         {
             var resource = GetResource(parameters);
             var json = await HttpClient.GetStringAsync(resource).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<OpenWeatherMapResult>(json);
+            return JsonConvert.DeserializeObject<OpenWeatherMapForecast>(json);
         }
 
         private Uri GetResource(Dictionary<string, string> parameters)

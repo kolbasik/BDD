@@ -18,7 +18,7 @@ namespace OpenWeatherMapSpecs.V1
     }
 
     [TestClass]
-    public abstract class OpenWeatherMapServiceSpec<TSpec> : MsSpec<TSpec, OpenWeatherMapResult>, IDisposable
+    public abstract class OpenWeatherMapServiceSpec<TSpec> : MsSpec<TSpec, OpenWeatherMapForecast>, IDisposable
         where TSpec : class
     {
         protected OpenWeatherMapService OpenWeatherMapService { get; private set; }

@@ -29,12 +29,6 @@ namespace NBDD.V2
         public CompositionContainer Container { get; }
         public Dictionary<string, object> Props { get; }
 
-        // TOSO: moved to extensions
-        public Scenario Bind(Action<Scenario> bind)
-        {
-            return Bind(bind.AsAsync());
-        }
-
         public Scenario Bind(Func<Scenario, Task> bind)
         {
             Units.Add(new Bind(bind.Bind(this)));
@@ -52,16 +46,6 @@ namespace NBDD.V2
             display += space + title;
             Units.Add(new Step(display, action));
             return this;
-        }
-
-        public string Normalize(string text)
-        {
-            var title = Regex.Replace(text, @"\$(?<Prop>\w+)",
-                match =>
-                    Props.ContainsKey(match.Groups[@"Prop"].Value)
-                        ? Convert.ToString(Props[match.Groups[@"Prop"].Value])
-                        : match.Value);
-            return title;
         }
     }
 }

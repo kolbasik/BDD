@@ -86,14 +86,14 @@ namespace NBDD.V2
                             {
                                 if (skip)
                                 {
-                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Normalize(step.Title)));
+                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Transform(step.Title)));
                                 }
                                 else
                                 {
                                     try
                                     {
                                         await unit.Action.Invoke().ConfigureAwait(false);
-                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Normalize(step.Title)));
+                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Transform(step.Title)));
                                     }
                                     catch (Exception ex)
                                     {
@@ -103,10 +103,14 @@ namespace NBDD.V2
                                             ex = ex.InnerException;
                                         }
                                         scenarioResult.Exception = ex;
-                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Normalize(step.Title)));
+                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Transform(step.Title)));
                                     }
                                 }
                                 var stepResult = scenarioResult.Steps.Last();
+                                if (stepResult.Name.StartsWith(@"Given", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    logger.Trace(string.Empty);
+                                }
                                 logger.Trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
                             }
                             else
