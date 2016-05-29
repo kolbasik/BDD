@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NBDD.V2
@@ -64,6 +64,7 @@ namespace NBDD.V2
         {
             using (this)
             {
+                var stopwatch = Stopwatch.StartNew();
                 var logger = Container.Resolve<Tracer>();
 
                 logger.Trace("Feature:");
@@ -86,14 +87,15 @@ namespace NBDD.V2
                             {
                                 if (skip)
                                 {
-                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Transform(step.Title)));
+                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Transform(step.Title), null));
                                 }
                                 else
                                 {
+                                    stopwatch.Restart();
                                     try
                                     {
                                         await unit.Action.Invoke().ConfigureAwait(false);
-                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Transform(step.Title)));
+                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Transform(step.Title), stopwatch.Elapsed));
                                     }
                                     catch (Exception ex)
                                     {
@@ -103,7 +105,7 @@ namespace NBDD.V2
                                             ex = ex.InnerException;
                                         }
                                         scenarioResult.Exception = ex;
-                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Transform(step.Title)));
+                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Transform(step.Title), stopwatch.Elapsed));
                                     }
                                 }
                                 var stepResult = scenarioResult.Steps.Last();
@@ -111,7 +113,10 @@ namespace NBDD.V2
                                 {
                                     logger.Trace(string.Empty);
                                 }
-                                logger.Trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
+                                logger.Trace(string.Format("\t{0} {1} {2}",
+                                    stepResult.Name,
+                                    stepResult.Success.HasValue ? (stepResult.Success.Value ? @"PASSED" : @"FAILED") : string.Empty,
+                                    stepResult.Elapsed.HasValue ? stepResult.Elapsed.Value.TotalMilliseconds.ToString(@"F1") + @"ms" : null));
                             }
                             else
                             {
