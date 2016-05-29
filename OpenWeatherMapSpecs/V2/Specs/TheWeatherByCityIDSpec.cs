@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using OpenWeatherMap;
 using Xunit;
@@ -6,26 +6,24 @@ using Xunit;
 namespace OpenWeatherMapSpecs.V2.Specs
 {
     [Export]
-    public sealed class TheWeatherByCityNameSpec
+    public sealed class TheWeatherByCityIDSpec
     {
         [Import]
         public OpenWeatherMapService OpenWeatherMapService { get; set; }
 
-        public string CityName { get; set; }
-        public string CountryCode { get; set; }
+        public string CityID { get; set; }
 
-        [Export]
         public OpenWeatherMapResult Forecast { get; private set; }
 
         public async Task When_I_have_asked_the_forecast()
         {
-            Forecast = await OpenWeatherMapService.GetWeatherForecastAsync(CityName, CountryCode).ConfigureAwait(false);
+            Forecast = await OpenWeatherMapService.GetWeatherForecastAsync(CityID).ConfigureAwait(false);
             Assert.NotNull(Forecast);
         }
 
-        public void It_should_contain_the_city_name()
+        public void It_should_contain_the_city_id()
         {
-            Assert.Equal(CityName, Forecast.Name);
+            Assert.Equal(CityID, Forecast.Id);
         }
     }
 }

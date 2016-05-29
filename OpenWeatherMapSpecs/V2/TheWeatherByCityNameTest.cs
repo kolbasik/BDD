@@ -8,11 +8,11 @@ using Xunit.Abstractions;
 
 namespace OpenWeatherMapSpecs.V2
 {
-    public class GetTheWeatherByCityNameSpec : IDisposable
+    public class TheWeatherByCityNameTest : IDisposable
     {
         private readonly ITestOutputHelper _output;
 
-        public GetTheWeatherByCityNameSpec(ITestOutputHelper output)
+        public TheWeatherByCityNameTest(ITestOutputHelper output)
         {
             _output = output;
             OpenWeatherMapService = new OpenWeatherMapService(OpenWeatherMapConfig.FromConfig());
@@ -28,7 +28,7 @@ namespace OpenWeatherMapSpecs.V2
         [Theory]
         [InlineData(@"London", @"UK")]
         [InlineData(@"Kyiv", @"UA")]
-        public Task Demo(string cityName, string countryCode)
+        public Task Test(string cityName, string countryCode)
         {
             return Bdd.Feature(
                     AsA: @"developer",
@@ -39,12 +39,14 @@ namespace OpenWeatherMapSpecs.V2
                 .Describe(a =>
                 {
                     a.Scenario()
+                        .Bind(@"CityName", _ => cityName)
+                        .Bind(@"CountryCode", _ => countryCode)
                         .Use<TheWeatherByCityNameSpec>()
-                        .Given($"the city is {cityName}", x => x.CityName = cityName)
-                            .And($"the country is {countryCode}", x => x.CountryCode = countryCode)
+                        .Given(@"the city is $CityName", x => x.CityName = cityName)
+                            .And(@"the country is $CountryCode", x => x.CountryCode = countryCode)
                         .When(@"I have asked the forecast", x => x.When_I_have_asked_the_forecast())
                         .Then(@"it should contain the city name", x => x.It_should_contain_the_city_name())
-                            .Use<TheWeatherForecastSpec>()
+                            .Use<TheWeatherForecastResultSpec>()
                             .And(@"it should contain the coordinates", x => x.It_should_contain_the_coordinates())
                             .And(@"it should contain the main information", x => x.It_should_contain_the_main_information())
                             .And(@"it should contain the wheather information", x => x.It_should_contain_the_wheather_information());

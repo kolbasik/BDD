@@ -46,6 +46,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\Bdd.cs" />
     <Compile Include="V2\Bdd.cs" />
+    <Compile Include="V2\Component.cs" />
+    <Compile Include="V2\ComponentExtensions.cs" />
+    <Compile Include="V2\CompositionContainerExtensions.cs" />
+    <Compile Include="V2\Feature.cs" />
+    <Compile Include="V2\FeatureExtensions.cs" />
+    <Compile Include="V2\FeatureResult.cs" />
+    <Compile Include="V2\StepResult.cs" />
+    <Compile Include="V2\Scenario.cs" />
+    <Compile Include="V2\ScenarioResult.cs" />
+    <Compile Include="V2\StepType.cs" />
+    <Compile Include="V2\Tracer.cs" />
+    <Compile Include="V2\Step.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
