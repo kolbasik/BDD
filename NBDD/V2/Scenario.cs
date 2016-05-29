@@ -39,16 +39,9 @@ namespace NBDD.V2
         }
 
         [DebuggerHidden]
-        public Scenario Step(StepType stepType, string title, Func<Task> action)
+        public Scenario Step(string title, Func<Task> action)
         {
-            const string space = @" ";
-            var display = stepType.ToString();
-            if (stepType == StepType.And)
-            {
-                display = space + display.ToLower();
-            }
-            display += space + title;
-            Units.Add(new Step(display, action));
+            Units.Add(new Step(title, action));
             return this;
         }
     }

@@ -20,60 +20,57 @@ namespace NBDD.V2
     }
 
     [DebuggerStepThrough, DebuggerNonUserCode]
-    public class Component<TComponent> : Component
+    public class Component<TActions> : Component
     {
         public Component(Scenario scenario) : base(scenario)
         {
-            Instance = new Lazy<TComponent>(Scenario.Container.Resolve<TComponent>);
+            Actions = new Lazy<TActions>(Scenario.Container.Resolve<TActions>);
         }
 
         [DebuggerHidden]
         public override void Dispose()
         {
-            if (Instance.IsValueCreated)
+            if (Actions.IsValueCreated)
             {
-                var disposable = Instance.Value as IDisposable;
+                var disposable = Actions.Value as IDisposable;
                 disposable?.Dispose();
             }
         }
 
-        internal Lazy<TComponent> Instance { get; }
+        internal Lazy<TActions> Actions { get; }
 
         [DebuggerHidden]
-        public Component<TComponent> Given(string title, Func<TComponent, Scenario, Task> action)
+        public Component<TActions> Given(string title, Func<TActions, Scenario, Task> action)
         {
-            return Step(StepType.Given, title, action);
-        }
-
-        [DebuggerHidden]
-        public Component<TComponent> When(string title, Func<TComponent, Scenario, Task> action)
-        {
-            return Step(StepType.When, title, action);
-        }
-
-        [DebuggerHidden]
-        public Component<TComponent> Then(string title, Func<TComponent, Scenario, Task> action)
-        {
-            return Step(StepType.Then, title, action);
-        }
-
-        [DebuggerHidden]
-        public Component<TComponent> And(string title, Func<TComponent, Scenario, Task> action)
-        {
-            return Step(StepType.And, title, action);
-        }
-
-        [DebuggerHidden]
-        internal Component<TComponent> Step(StepType stepType, string title, Func<TComponent, Scenario, Task> action)
-        {
-            Scenario.Step(stepType, title, action.Bind(Instance).Bind(Scenario));
+            Scenario.Step(@"Given " + title, action.Bind(Actions).Bind(Scenario));
             return this;
         }
 
         [DebuggerHidden]
-        internal Component<TComponent> Bind(Func<TComponent, Scenario, Task> bind)
+        public Component<TActions> When(string title, Func<TActions, Scenario, Task> action)
         {
-            Scenario.Bind(bind.Bind(Instance));
+            Scenario.Step(@"When " + title, action.Bind(Actions).Bind(Scenario));
+            return this;
+        }
+
+        [DebuggerHidden]
+        public Component<TActions> Then(string title, Func<TActions, Scenario, Task> action)
+        {
+            Scenario.Step(@"Then " + title, action.Bind(Actions).Bind(Scenario));
+            return this;
+        }
+
+        [DebuggerHidden]
+        public Component<TActions> And(string title, Func<TActions, Scenario, Task> action)
+        {
+            Scenario.Step(@" and " + title, action.Bind(Actions).Bind(Scenario));
+            return this;
+        }
+
+        [DebuggerHidden]
+        internal Component<TActions> Bind(Func<TActions, Scenario, Task> bind)
+        {
+            Scenario.Bind(bind.Bind(Actions));
             return this;
         }
     }

@@ -7,43 +7,43 @@ namespace NBDD.V2
     public static class ComponentExtensions
     {
         [DebuggerHidden]
-        public static Component<TComponent> Use<TComponent>(this Scenario scenario)
+        public static Component<TActions> Use<TActions>(this Scenario scenario)
         {
-            return new Component<TComponent>(scenario);
+            return new Component<TActions>(scenario);
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> Use<TComponent>(this Component componentOld)
+        public static Component<TActions> Use<TActions>(this Component componentOld)
         {
-            return new Component<TComponent>(componentOld.Scenario);
+            return new Component<TActions>(componentOld.Scenario);
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> Given<TComponent>(this Component<TComponent> component, string title, Action<TComponent, Scenario> action)
+        public static Component<TActions> Given<TActions>(this Component<TActions> component, string title, Action<TActions, Scenario> action)
         {
             return component.Given(title, action.AsAsync());
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> When<TComponent>(this Component<TComponent> component, string title, Action<TComponent, Scenario> action)
+        public static Component<TActions> When<TActions>(this Component<TActions> component, string title, Action<TActions, Scenario> action)
         {
             return component.When(title, action.AsAsync());
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> Then<TComponent>(this Component<TComponent> component, string title, Action<TComponent, Scenario> action)
+        public static Component<TActions> Then<TActions>(this Component<TActions> component, string title, Action<TActions, Scenario> action)
         {
             return component.Then(title, action.AsAsync());
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> And<TComponent>(this Component<TComponent> component, string title, Action<TComponent, Scenario> action)
+        public static Component<TActions> And<TActions>(this Component<TActions> component, string title, Action<TActions, Scenario> action)
         {
             return component.And(title, action.AsAsync());
         }
 
         [DebuggerHidden]
-        public static Component<TComponent> Bind<TComponent>(this Component<TComponent> component, Action<TComponent, Scenario> action)
+        public static Component<TActions> Bind<TActions>(this Component<TActions> component, Action<TActions, Scenario> action)
         {
             return component.Bind(action.AsAsync());
         }

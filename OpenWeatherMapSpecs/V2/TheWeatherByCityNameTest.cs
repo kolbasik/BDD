@@ -19,7 +19,7 @@ namespace OpenWeatherMapSpecs.V2
         [Theory]
         [InlineData(@"London", @"UK")]
         [InlineData(@"Paris", @"FR")]
-        [InlineData(@"Kyiv", @"UA")]
+        [InlineData(@"Kiev", @"UA")]
         public Task Test(string cityName, string countryCode)
         {
             return Bdd.Feature(
