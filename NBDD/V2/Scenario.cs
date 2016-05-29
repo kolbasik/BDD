@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Scenario: units={Units.Count}")]
     public class Scenario : IDisposable
     {
@@ -18,6 +19,7 @@ namespace NBDD.V2
             Props = new Dictionary<string, object>();
         }
 
+        [DebuggerHidden]
         public void Dispose()
         {
             Components.ForEach(x => x.Dispose());
@@ -29,12 +31,14 @@ namespace NBDD.V2
         public CompositionContainer Container { get; }
         public Dictionary<string, object> Props { get; }
 
+        [DebuggerHidden]
         public Scenario Bind(Func<Scenario, Task> bind)
         {
             Units.Add(new Bind(bind.Bind(this)));
             return this;
         }
 
+        [DebuggerHidden]
         public Scenario Step(StepType stepType, string title, Func<Task> action)
         {
             const string space = @" ";
