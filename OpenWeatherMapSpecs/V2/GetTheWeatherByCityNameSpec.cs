@@ -40,13 +40,14 @@ namespace OpenWeatherMapSpecs.V2
                 {
                     a.Scenario()
                         .Use<TheWeatherByCityNameSpec>()
-                            .Given($"the city is {cityName}", x => x.CityName = cityName)
-                                .And($"the country is {countryCode}", x => x.CountryCode = countryCode)
-                            .When(@"I have asked the forecast", x => x.When_I_have_asked_the_forecast())
-                            .Then(@"it should contain the city name", x => x.It_should_contain_the_city_name())
-                                .And(@"it should contain the coordinates", x => x.It_should_contain_the_coordinates())
-                                .And(@"it should contain the main information", x => x.It_should_contain_the_main_information())
-                                .And(@"it should contain the wheather information", x => x.It_should_contain_the_wheather_information());
+                        .Given($"the city is {cityName}", x => x.CityName = cityName)
+                            .And($"the country is {countryCode}", x => x.CountryCode = countryCode)
+                        .When(@"I have asked the forecast", x => x.When_I_have_asked_the_forecast())
+                        .Then(@"it should contain the city name", x => x.It_should_contain_the_city_name())
+                            .Use<TheWeatherForecastSpec>()
+                            .And(@"it should contain the coordinates", x => x.It_should_contain_the_coordinates())
+                            .And(@"it should contain the main information", x => x.It_should_contain_the_main_information())
+                            .And(@"it should contain the wheather information", x => x.It_should_contain_the_wheather_information());
                 })
                 .TestAsync();
         }

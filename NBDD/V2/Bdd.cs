@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
@@ -17,13 +16,8 @@ namespace NBDD.V2
 
         static Bdd()
         {
-            Container = new CompositionContainer(new ApplicationCatalog());
-            Container.ComposeExportedValue(nameof(Bdd), new Tracer());
-        }
-
-        public static TService Resolve<TService>(CompositionContainer container) where TService : class
-        {
-            return container.GetExportedValueOrDefault<TService>() ?? container.GetExportedValue<TService>(nameof(Bdd));
+            Container = new CompositionContainer().Scope();
+            Container.Register(nameof(Bdd), new Tracer());
         }
 
         public static Feature Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
@@ -45,7 +39,7 @@ namespace NBDD.V2
         public Feature()
         {
             Scenarios = new List<Scenario>();
-            Container = new CompositionContainer(Bdd.Container);
+            Container = Bdd.Container.Scope();
         }
 
         public void Dispose()
@@ -95,7 +89,7 @@ namespace NBDD.V2
         {
             using (this)
             {
-                var logger = Bdd.Resolve<Tracer>(Container);
+                var logger = Container.Resolve<Tracer>();
 
                 logger.Trace("Feature:");
                 logger.Trace("\tAs a " + AsA);
@@ -152,9 +146,8 @@ namespace NBDD.V2
         public Scenario(Feature feature)
         {
             Steps = new List<Step>();
-            Components = new List<IDisposable>();
-            Container = new CompositionContainer(feature.Container);
-            Container.ComposeExportedValue(Container);
+            Components = new List<Component>();
+            Container = feature.Container.Scope();
         }
 
         public void Dispose()
@@ -164,8 +157,8 @@ namespace NBDD.V2
         }
 
         internal List<Step> Steps { get; }
+        internal List<Component> Components { get; }
         public CompositionContainer Container { get; }
-        internal List<IDisposable> Components { get; }
 
         public Scenario Step(Stage stage, string title, Func<Task> action)
         {
@@ -194,24 +187,36 @@ namespace NBDD.V2
         public Func<Task> Action { get; }
     }
 
-    public class Component<TComponent> : IDisposable where TComponent : class, new()
+    public abstract class Component : IDisposable
     {
         public Component(Scenario scenario)
         {
             Scenario = scenario;
-            Instance = new TComponent();
-            Scenario.Container.ComposeParts(Instance);
             Scenario.Components.Add(this);
         }
 
-        public void Dispose()
+        internal Scenario Scenario { get; }
+
+        public abstract void Dispose();
+    }
+
+    public class Component<TComponent> : Component where TComponent :class
+    {
+        public Component(Scenario scenario) : base(scenario)
         {
-            var disposable = Instance as IDisposable;
-            disposable?.Dispose();
+            Instance = new Lazy<TComponent>(Scenario.Container.Resolve<TComponent>);
         }
 
-        internal Scenario Scenario { get; }
-        internal TComponent Instance { get; }
+        public override void Dispose()
+        {
+            if (Instance.IsValueCreated)
+            {
+                var disposable = Instance.Value as IDisposable;
+                disposable?.Dispose();
+            }
+        }
+
+        internal Lazy<TComponent> Instance { get; }
 
         public Component<TComponent> Given(string title, Func<TComponent, Task> action)
         {
@@ -235,80 +240,8 @@ namespace NBDD.V2
 
         internal Component<TComponent> Step(Stage stage, string title, Func<TComponent, Task> action)
         {
-            Scenario.Step(stage, title, () => action(Instance));
+            Scenario.Step(stage, title, () => action(Instance.Value));
             return this;
-        }
-    }
-
-    public static class FeatureExtensions
-    {
-        public static Feature UseBdd<TService>(this Feature feature)
-        {
-            var service = feature.Container.GetExportedValue<TService>(nameof(Bdd));
-            return feature.Use(service);
-        }
-
-        public static Feature UseTrace(this Feature feature, Action<string> trace)
-        {
-            return feature.Use(new Tracer(trace));
-        }
-
-        public static Feature Use<TService>(this Feature feature, TService service)
-        {
-            feature.Container.ComposeExportedValue(service);
-            return feature;
-        }
-    }
-
-    public static class ComponentExtensions
-    {
-        private static readonly Task Done = Task.FromResult(true);
-
-        public static Component<TComponent> Use<TComponent>(this Scenario scenario)
-            where TComponent : class, new()
-        {
-            return new Component<TComponent>(scenario);
-        }
-
-        public static Component<TComponentNew> Use<TComponentOld, TComponentNew>(this Component<TComponentOld> componentOld)
-            where TComponentOld : class, new()
-            where TComponentNew : class, new()
-        {
-            return new Component<TComponentNew>(componentOld.Scenario);
-        }
-
-        public static Component<TComponent> Given<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
-            where TComponent : class, new()
-        {
-            return component.Step(Stage.Given, title, action);
-        }
-
-        public static Component<TComponent> When<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
-            where TComponent : class, new()
-        {
-            return component.Step(Stage.When, title, action);
-        }
-
-        public static Component<TComponent> Then<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
-            where TComponent : class, new()
-        {
-            return component.Step(Stage.Then, title, action);
-        }
-
-        public static Component<TComponent> And<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
-            where TComponent : class, new()
-        {
-            return component.Step(Stage.And, title, action);
-        }
-
-        private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, Stage stage, string title, Action<TComponent> action)
-            where TComponent : class, new()
-        {
-            return component.Step(stage, title, instance =>
-            {
-                action(instance);
-                return Done;
-            });
         }
     }
 
@@ -365,14 +298,110 @@ namespace NBDD.V2
             _trace = trace;
         }
 
-        public void Trace(string message)
+        public void Trace(string message) => _trace.Invoke(message);
+
+        public static void WriteLine(string message) => System.Diagnostics.Trace.WriteLine(message);
+    }
+
+    public static class CompositionContainerExtensions
+    {
+        public static CompositionContainer Register<TService>(this CompositionContainer container, string contractName, TService service)
         {
-            _trace.Invoke(message);
+            container.ComposeExportedValue<TService>(contractName, service);
+            return container;
         }
 
-        public static void WriteLine(string message)
+        public static CompositionContainer Register<TService>(this CompositionContainer container, TService service)
         {
-            System.Diagnostics.Trace.WriteLine(message);
+            container.ComposeExportedValue<TService>(service);
+            return container;
+        }
+
+        public static TService Resolve<TService>(this CompositionContainer container, string contractName)
+        {
+            return container.GetExportedValue<TService>(contractName);
+        }
+
+        public static TService Resolve<TService>(this CompositionContainer container) where TService : class
+        {
+            return container.GetExportedValueOrDefault<TService>() ?? container.Resolve<TService>(nameof(Bdd));
+        }
+
+        public static CompositionContainer Scope(this CompositionContainer parent)
+        {
+            var container = new CompositionContainer(new ApplicationCatalog(), parent);
+            return container.Register(container);
+        }
+    }
+
+    public static class FeatureExtensions
+    {
+        public static Feature UseBdd<TService>(this Feature feature)
+        {
+            var service = feature.Container.Resolve<TService>(nameof(Bdd));
+            return feature.Use(service);
+        }
+
+        public static Feature UseTrace(this Feature feature, Action<string> trace)
+        {
+            return feature.Use(new Tracer(trace));
+        }
+
+        public static Feature Use<TService>(this Feature feature, TService service)
+        {
+            feature.Container.Register<TService>(service);
+            return feature;
+        }
+    }
+
+    public static class ComponentExtensions
+    {
+        private static readonly Task Done = Task.FromResult(true);
+
+        public static Component<TComponent> Use<TComponent>(this Scenario scenario)
+            where TComponent : class
+        {
+            return new Component<TComponent>(scenario);
+        }
+
+        public static Component<TComponent> Use<TComponent>(this Component componentOld)
+            where TComponent : class
+        {
+            return new Component<TComponent>(componentOld.Scenario);
+        }
+
+        public static Component<TComponent> Given<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class
+        {
+            return component.Step(Stage.Given, title, action);
+        }
+
+        public static Component<TComponent> When<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class
+        {
+            return component.Step(Stage.When, title, action);
+        }
+
+        public static Component<TComponent> Then<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class
+        {
+            return component.Step(Stage.Then, title, action);
+        }
+
+        public static Component<TComponent> And<TComponent>(this Component<TComponent> component, string title, Action<TComponent> action)
+            where TComponent : class
+        {
+            return component.Step(Stage.And, title, action);
+        }
+
+        private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, Stage stage, string title, Action<TComponent> action)
+            where TComponent : class
+        {
+            return component.Step(stage, title, instance =>
+            {
+                action(instance);
+                return Done;
+            });
         }
     }
 }

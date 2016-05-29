@@ -5,6 +5,7 @@ using Xunit;
 
 namespace OpenWeatherMapSpecs.V2.Specs
 {
+    [Export]
     public sealed class TheWeatherByCityNameSpec
     {
         [Import]
@@ -13,6 +14,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
         public string CityName { get; set; }
         public string CountryCode { get; set; }
 
+        [Export]
         public OpenWeatherMapResult Result { get; private set; }
 
         public async Task When_I_have_asked_the_forecast()
@@ -24,21 +26,6 @@ namespace OpenWeatherMapSpecs.V2.Specs
         public void It_should_contain_the_city_name()
         {
             Assert.Equal(CityName, Result.Name);
-        }
-
-        public void It_should_contain_the_coordinates()
-        {
-            Assert.NotNull(Result.Coord);
-        }
-
-        public void It_should_contain_the_main_information()
-        {
-            Assert.NotNull(Result.Main);
-        }
-
-        public void It_should_contain_the_wheather_information()
-        {
-            Assert.NotNull(Result.Weather);
         }
     }
 }
