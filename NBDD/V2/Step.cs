@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     internal abstract class Unit
     {
         protected Unit(Func<Task> action)
@@ -14,6 +15,7 @@ namespace NBDD.V2
         public Func<Task> Action { get; }
     }
 
+    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Bind")]
     internal class Bind : Unit
     {
@@ -22,6 +24,7 @@ namespace NBDD.V2
         }
     }
 
+    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Step: {Title}")]
     internal sealed class Step : Unit
     {

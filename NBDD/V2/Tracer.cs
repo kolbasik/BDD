@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Tracer
     {
         private readonly Action<string> trace;
@@ -11,6 +13,7 @@ namespace NBDD.V2
             this.trace = trace;
         }
 
+        [DebuggerHidden]
         public void Trace(string message) => trace.Invoke(message);
     }
 }

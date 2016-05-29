@@ -1,16 +1,20 @@
 using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     public static class ScenarioExtensions
     {
+        [DebuggerHidden]
         public static Scenario Prop<T>(this Scenario scenario, string name, T value)
         {
             scenario.Props[name] = value;
             return scenario;
         }
 
+        [DebuggerHidden]
         public static T Prop<T>(this Scenario scenario, string name)
         {
             object value;
@@ -21,11 +25,13 @@ namespace NBDD.V2
             return default(T);
         }
 
+        [DebuggerHidden]
         public static Scenario Bind(this Scenario scenario, Action<Scenario> bind)
         {
             return scenario.Bind(bind.AsAsync());
         }
 
+        [DebuggerHidden]
         public static string Transform(this Scenario scenario, string text)
         {
             var title = Regex.Replace(text, @"\$(?<Prop>\w+)",

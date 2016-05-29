@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Step: {Success} {Name}")]
     public sealed class StepResult
     {

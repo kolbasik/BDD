@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Feature : IDisposable
     {
         public Feature()
@@ -30,6 +31,7 @@ namespace NBDD.V2
         internal List<Scenario> Scenarios { get; }
         public CompositionContainer Container { get; }
 
+        [DebuggerHidden]
         public Scenario Scenario()
         {
             var scenario = new Scenario(this);
@@ -37,12 +39,14 @@ namespace NBDD.V2
             return scenario;
         }
 
+        [DebuggerHidden]
         public Feature Describe(Action<Feature> describe)
         {
             describe(this);
             return this;
         }
 
+        [DebuggerHidden]
         public async Task TestAsync()
         {
             var featureResult = await PlayAsync().ConfigureAwait(false);
@@ -60,6 +64,7 @@ namespace NBDD.V2
             }
         }
 
+        [DebuggerHidden]
         public async Task<FeatureResult> PlayAsync()
         {
             using (this)

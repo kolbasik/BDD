@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace NBDD.V2
 {
+    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Scenario: {Steps.Count} {Exception}")]
     public sealed class ScenarioResult
     {
