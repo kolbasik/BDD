@@ -1,16 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
     public static class Bdd
     {
+        public static readonly CompositionContainer Container;
+
+        static Bdd()
+        {
+            Container = new CompositionContainer(new ApplicationCatalog());
+            Container.ComposeExportedValue(nameof(Bdd), new Tracer());
+        }
+
+        public static TService Resolve<TService>(CompositionContainer container) where TService : class
+        {
+            return container.GetExportedValueOrDefault<TService>() ?? container.GetExportedValue<TService>(nameof(Bdd));
+        }
+
         public static Feature Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
         {
             return new Feature { AsA = AsA, IWant = IWant, SoThat = SoThat };
@@ -25,13 +40,12 @@ namespace NBDD.V2
         Then
     }
 
-    [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Feature : IDisposable
     {
         public Feature()
         {
             Scenarios = new List<Scenario>();
-            Container = new CompositionContainer(new ApplicationCatalog());
+            Container = new CompositionContainer(Bdd.Container);
         }
 
         public void Dispose()
@@ -54,36 +68,47 @@ namespace NBDD.V2
             return scenario;
         }
 
-        [DebuggerHidden, DebuggerStepThrough]
         public Feature Describe(Action<Feature> describe)
         {
             describe(this);
             return this;
         }
 
-        [DebuggerHidden, DebuggerStepThrough]
-        public FeatureResult Play(Action<string> trace)
+        public async Task TestAsync()
         {
-            return PlayAsync(trace).GetAwaiter().GetResult();
+            var featureResult = await PlayAsync().ConfigureAwait(false);
+            var exceptions = featureResult.Scenarios.Select(x => x.Exception).Where(x => x != null).ToArray();
+            if (exceptions.Length > 0)
+            {
+                if (exceptions.Length == 1)
+                {
+                    ExceptionDispatchInfo.Capture(exceptions[0]).Throw();
+                }
+                else
+                {
+                    throw new AggregateException(exceptions);
+                }
+            }
         }
 
-        [DebuggerHidden, DebuggerStepThrough]
-        public async Task<FeatureResult> PlayAsync(Action<string> trace)
+        public async Task<FeatureResult> PlayAsync()
         {
-            trace("Feature:");
-            trace("\tAs a " + AsA);
-            trace("\tI want " + IWant);
-            trace("\tSo that " + SoThat);
-
             using (this)
             {
+                var logger = Bdd.Resolve<Tracer>(Container);
+
+                logger.Trace("Feature:");
+                logger.Trace("\tAs a " + AsA);
+                logger.Trace("\tI want " + IWant);
+                logger.Trace("\tSo that " + SoThat);
+
                 var featureResult = new FeatureResult(this);
                 foreach (var scenario in Scenarios)
                 {
                     using (scenario)
                     {
                         var skip = false;
-                        trace($"{Environment.NewLine}Scenario:");
+                        logger.Trace($"{Environment.NewLine}Scenario:");
                         var scenarioResult = new ScenarioResult(scenario);
                         foreach (var step in scenario.Steps)
                         {
@@ -110,9 +135,9 @@ namespace NBDD.V2
                                 }
                             }
                             var stepResult = scenarioResult.Steps.Last();
-                            trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
+                            logger.Trace("\t" + stepResult.Name + (stepResult.Success.HasValue ? (stepResult.Success.Value ? @" - PASSED" : @" - FAILED") : string.Empty));
                         }
-                        trace($"{Environment.NewLine}{scenarioResult.Exception}");
+                        logger.Trace($"{Environment.NewLine}{scenarioResult.Exception}");
                         featureResult.Scenarios.Add(scenarioResult);
                     }
                 }
@@ -121,15 +146,15 @@ namespace NBDD.V2
         }
     }
 
-    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Scenario: steps={Steps.Count}")]
     public class Scenario : IDisposable
     {
         public Scenario(Feature feature)
         {
             Steps = new List<Step>();
-            Container = new CompositionContainer(feature.Container);
             Components = new List<IDisposable>();
+            Container = new CompositionContainer(feature.Container);
+            Container.ComposeExportedValue(Container);
         }
 
         public void Dispose()
@@ -156,7 +181,6 @@ namespace NBDD.V2
         }
     }
 
-    [DebuggerStepThrough, DebuggerNonUserCode]
     [DebuggerDisplay("Step: {Title}")]
     internal sealed class Step
     {
@@ -170,7 +194,6 @@ namespace NBDD.V2
         public Func<Task> Action { get; }
     }
 
-    [DebuggerStepThrough, DebuggerNonUserCode]
     public class Component<TComponent> : IDisposable where TComponent : class, new()
     {
         public Component(Scenario scenario)
@@ -210,7 +233,6 @@ namespace NBDD.V2
             return Step(Stage.And, title, action);
         }
 
-        [DebuggerHidden, DebuggerStepThrough]
         internal Component<TComponent> Step(Stage stage, string title, Func<TComponent, Task> action)
         {
             Scenario.Step(stage, title, () => action(Instance));
@@ -218,7 +240,22 @@ namespace NBDD.V2
         }
     }
 
-    [DebuggerStepThrough, DebuggerNonUserCode]
+    public static class FeatureExtensions
+    {
+        public static Feature UseBdd<TService>(this Feature feature)
+        {
+            var service = feature.Container.GetExportedValue<TService>(nameof(Bdd));
+            feature.Container.ComposeExportedValue(service);
+            return feature;
+        }
+
+        public static Feature UseTrace(this Feature feature, Action<string> trace)
+        {
+            feature.Container.ComposeExportedValue(new Tracer(trace));
+            return feature;
+        }
+    }
+
     public static class ComponentExtensions
     {
         private static readonly Task Done = Task.FromResult(true);
@@ -260,7 +297,6 @@ namespace NBDD.V2
             return component.Step(Stage.And, title, action);
         }
 
-        [DebuggerHidden, DebuggerStepThrough]
         private static Component<TComponent> Step<TComponent>(this Component<TComponent> component, Stage stage, string title, Action<TComponent> action)
             where TComponent : class, new()
         {
@@ -310,5 +346,29 @@ namespace NBDD.V2
 
         public bool? Success { get; }
         public string Name { get; }
+    }
+
+    public sealed class Tracer
+    {
+        private readonly Action<string> _trace;
+
+        public Tracer() : this(WriteLine)
+        {
+        }
+
+        public Tracer(Action<string> trace)
+        {
+            _trace = trace;
+        }
+
+        public void Trace(string message)
+        {
+            _trace.Invoke(message);
+        }
+
+        public static void WriteLine(string message)
+        {
+            System.Diagnostics.Trace.WriteLine(message);
+        }
     }
 }

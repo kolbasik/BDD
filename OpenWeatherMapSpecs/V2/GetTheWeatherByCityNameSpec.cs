@@ -24,9 +24,9 @@ namespace OpenWeatherMapSpecs.V2
                     AsA: @"developer",
                     IWant: @"to get the weather forecast by city name",
                     SoThat: @"he will be able to plan holidays.")
-                .Describe(the =>
+                .Describe(a =>
                 {
-                    the.Scenario()
+                    a.Scenario()
                         .Use<TheWeatherByCityNameSpec>()
                             .Given($"the city is {cityName}", x => x.CityName = cityName)
                                 .And($"the country is {countryCode}", x => x.CountryCode = countryCode)
@@ -36,7 +36,8 @@ namespace OpenWeatherMapSpecs.V2
                                 .And(@"it should contain the main information", x => x.It_should_contain_the_main_information())
                                 .And(@"it should contain the wheather information", x => x.It_should_contain_the_wheather_information());
                 })
-                .PlayAsync(_output.WriteLine);
+                .UseTrace(_output.WriteLine)
+                .TestAsync();
         }
     }
 }
