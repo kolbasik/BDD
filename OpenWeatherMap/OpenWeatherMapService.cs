@@ -10,19 +10,11 @@ namespace OpenWeatherMap
 {
     public sealed class OpenWeatherMapService : IDisposable
     {
-        public OpenWeatherMapService() : this(
-            new Uri(@"http://api.openweathermap.org/data/2.5/weather", UriKind.Absolute),
-            @"077cc5480d6fd71002f3999f7b04218c")
+        public OpenWeatherMapService(OpenWeatherMapConfig config)
         {
-        }
-
-        public OpenWeatherMapService(Uri serviceUri, string appId)
-        {
-            if (serviceUri == null) throw new ArgumentNullException(nameof(serviceUri));
-            if (appId == null) throw new ArgumentNullException(nameof(appId));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             HttpClient = new HttpClient();
-            ServiceUri = serviceUri;
-            AppId = appId;
+            Config = config;
         }
 
         public void Dispose()
@@ -30,23 +22,23 @@ namespace OpenWeatherMap
             HttpClient.Dispose();
         }
 
-        public HttpClient HttpClient { get; private set; }
-        public Uri ServiceUri { get; private set; }
-        public string AppId { get; private set; }
+        public HttpClient HttpClient { get; }
+        public OpenWeatherMapConfig Config { get; }
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(string city, string country)
+
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(string city, string country)
         {
             var parameters = new Dictionary<string, string> { { "q", city + "," + country } };
             return ExecuteAsync(parameters);
         }
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(string id)
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(string id)
         {
             var parameters = new Dictionary<string, string> { { "id", id } };
             return ExecuteAsync(parameters);
         }
 
-        public Task<OpenWeatherMapResult> GetWeatherForecastAsync(decimal lat, decimal lon)
+        public Task<OpenWeatherMapForecast> GetWeatherForecastAsync(decimal lat, decimal lon)
         {
             var parameters = new Dictionary<string, string>
             {
@@ -56,17 +48,17 @@ namespace OpenWeatherMap
             return ExecuteAsync(parameters);
         }
 
-        private async Task<OpenWeatherMapResult> ExecuteAsync(Dictionary<string, string> parameters)
+        private async Task<OpenWeatherMapForecast> ExecuteAsync(Dictionary<string, string> parameters)
         {
             var resource = GetResource(parameters);
             var json = await HttpClient.GetStringAsync(resource).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<OpenWeatherMapResult>(json);
+            return JsonConvert.DeserializeObject<OpenWeatherMapForecast>(json);
         }
 
         private Uri GetResource(Dictionary<string, string> parameters)
         {
-            parameters = new Dictionary<string, string>(parameters) { { @"appid", AppId } };
-            var resource = new UriBuilder(ServiceUri)
+            parameters = new Dictionary<string, string>(parameters) { { @"appid", Config.AppId } };
+            var resource = new UriBuilder(Config.ServiceUri)
             {
                 Query = string.Join(@"&", parameters.Select(x => $"{x.Key}={x.Value}"))
             };
