@@ -4,6 +4,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NBDD.V2
@@ -85,14 +86,14 @@ namespace NBDD.V2
                             {
                                 if (skip)
                                 {
-                                    scenarioResult.Steps.Add(new StepResult(null, step.Title));
+                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Normalize(step.Title)));
                                 }
                                 else
                                 {
                                     try
                                     {
                                         await unit.Action.Invoke().ConfigureAwait(false);
-                                        scenarioResult.Steps.Add(new StepResult(true, step.Title));
+                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Normalize(step.Title)));
                                     }
                                     catch (Exception ex)
                                     {
@@ -102,7 +103,7 @@ namespace NBDD.V2
                                             ex = ex.InnerException;
                                         }
                                         scenarioResult.Exception = ex;
-                                        scenarioResult.Steps.Add(new StepResult(false, step.Title));
+                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Normalize(step.Title)));
                                     }
                                 }
                                 var stepResult = scenarioResult.Steps.Last();

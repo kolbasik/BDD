@@ -5,7 +5,7 @@ using Xunit;
 namespace OpenWeatherMapSpecs.V2.Specs
 {
     [Export]
-    public sealed class TheWeatherForecastResultSpec
+    public sealed class TheWeatherForecastResultActions
     {
         [Import]
         public OpenWeatherMapResult Forecast { get; set; }

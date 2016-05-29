@@ -6,7 +6,7 @@ using Xunit;
 namespace OpenWeatherMapSpecs.V2.Specs
 {
     [Export]
-    public sealed class TheWeatherByCityIDSpec
+    public sealed class TheWeatherByCityIDActions
     {
         [Import]
         public OpenWeatherMapService OpenWeatherMapService { get; set; }

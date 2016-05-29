@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NBDD.V2
@@ -51,6 +52,16 @@ namespace NBDD.V2
             display += space + title;
             Units.Add(new Step(display, action));
             return this;
+        }
+
+        public string Normalize(string text)
+        {
+            var title = Regex.Replace(text, @"\$(?<Prop>\w+)",
+                match =>
+                    Props.ContainsKey(match.Groups[@"Prop"].Value)
+                        ? Convert.ToString(Props[match.Groups[@"Prop"].Value])
+                        : match.Value);
+            return title;
         }
     }
 }

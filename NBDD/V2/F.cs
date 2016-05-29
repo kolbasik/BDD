@@ -45,5 +45,10 @@ namespace NBDD.V2
         {
             return arg2 => func(arg1, arg2);
         }
+
+        public static Func<TArg2, TReturn> Bind<TArg1, TArg2, TReturn>(this Func<TArg1, TArg2, TReturn> func, Lazy<TArg1> arg1)
+        {
+            return arg2 => func(arg1.Value, arg2);
+        }
     }
 }

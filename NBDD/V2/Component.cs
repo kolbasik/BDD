@@ -34,29 +34,35 @@ namespace NBDD.V2
 
         internal Lazy<TComponent> Instance { get; }
 
-        public Component<TComponent> Given(string title, Func<Scenario, TComponent, Task> action)
+        public Component<TComponent> Given(string title, Func<TComponent, Scenario, Task> action)
         {
             return Step(StepType.Given, title, action);
         }
 
-        public Component<TComponent> When(string title, Func<Scenario, TComponent, Task> action)
+        public Component<TComponent> When(string title, Func<TComponent, Scenario, Task> action)
         {
             return Step(StepType.When, title, action);
         }
 
-        public Component<TComponent> Then(string title, Func<Scenario, TComponent, Task> action)
+        public Component<TComponent> Then(string title, Func<TComponent, Scenario, Task> action)
         {
             return Step(StepType.Then, title, action);
         }
 
-        public Component<TComponent> And(string title, Func<Scenario, TComponent, Task> action)
+        public Component<TComponent> And(string title, Func<TComponent, Scenario, Task> action)
         {
             return Step(StepType.And, title, action);
         }
 
-        internal Component<TComponent> Step(StepType stepType, string title, Func<Scenario, TComponent, Task> action)
+        internal Component<TComponent> Bind(Func<TComponent, Scenario, Task> bind)
         {
-            Scenario.Step(stepType, title, action.Bind(Scenario).Bind(Instance));
+            Scenario.Bind(bind.Bind(Instance));
+            return this;
+        }
+
+        internal Component<TComponent> Step(StepType stepType, string title, Func<TComponent, Scenario, Task> action)
+        {
+            Scenario.Step(stepType, title, action.Bind(Instance).Bind(Scenario));
             return this;
         }
     }
