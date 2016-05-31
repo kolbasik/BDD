@@ -20,7 +20,7 @@ namespace NBDD.V2
     }
 
     [DebuggerStepThrough, DebuggerNonUserCode]
-    public class Component<TActions> : Component
+    public sealed class Component<TActions> : Component
     {
         public Component(Scenario scenario) : base(scenario)
         {

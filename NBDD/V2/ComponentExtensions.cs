@@ -13,9 +13,9 @@ namespace NBDD.V2
         }
 
         [DebuggerHidden]
-        public static Component<TActions> Use<TActions>(this Component componentOld)
+        public static Component<TActions> Use<TActions>(this Component component)
         {
-            return new Component<TActions>(componentOld.Scenario);
+            return new Component<TActions>(component.Scenario);
         }
 
         [DebuggerHidden]

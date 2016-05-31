@@ -9,6 +9,7 @@ namespace NBDD.V2
     {
         protected Unit(Func<Task> action)
         {
+            if (action == null) throw new ArgumentNullException(nameof(action));
             Action = action;
         }
 
@@ -30,6 +31,7 @@ namespace NBDD.V2
     {
         public Step(string title, Func<Task> action) : base(action)
         {
+            if (title == null) throw new ArgumentNullException(nameof(title));
             Title = title;
         }
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
 using NBDD.V2;
 using Ploeh.AutoFixture;
 using Xunit;
