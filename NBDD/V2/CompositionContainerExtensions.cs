@@ -22,20 +22,27 @@ namespace NBDD.V2
         }
 
         [DebuggerHidden]
+        public static TService Resolve<TService>(this CompositionContainer container)
+        {
+            return container.GetExportedValue<TService>();
+        }
+
+        [DebuggerHidden]
         public static TService Resolve<TService>(this CompositionContainer container, string contractName)
         {
             return container.GetExportedValue<TService>(contractName);
         }
 
         [DebuggerHidden]
-        public static TService Resolve<TService>(this CompositionContainer container)
+        public static TService ResolveOrDefault<TService>(this CompositionContainer container)
         {
-            var service = container.GetExportedValueOrDefault<TService>();
-            if (object.Equals(service, default(TService)))
-            {
-                return container.Resolve<TService>(nameof(Bdd));
-            }
-            return service;
+            return container.GetExportedValueOrDefault<TService>();
+        }
+
+        [DebuggerHidden]
+        public static TService ResolveOrDefault<TService>(this CompositionContainer container, string contractName = null)
+        {
+            return container.GetExportedValueOrDefault<TService>(contractName);
         }
 
         [DebuggerHidden]
