@@ -42,28 +42,28 @@ namespace NBDD.V2
         [DebuggerHidden]
         public Component<TActions> Given(string title, Func<TActions, Scenario, Task> action)
         {
-            Scenario.Step(@"Given " + title, action.Bind(Actions).Bind(Scenario));
+            Scenario.Step(Humanizer.Prefix(@"Given ", title), action.Bind(Actions).Bind(Scenario));
             return this;
         }
 
         [DebuggerHidden]
         public Component<TActions> When(string title, Func<TActions, Scenario, Task> action)
         {
-            Scenario.Step(@"When " + title, action.Bind(Actions).Bind(Scenario));
+            Scenario.Step(Humanizer.Prefix(@"When ", title), action.Bind(Actions).Bind(Scenario));
             return this;
         }
 
         [DebuggerHidden]
         public Component<TActions> Then(string title, Func<TActions, Scenario, Task> action)
         {
-            Scenario.Step(@"Then " + title, action.Bind(Actions).Bind(Scenario));
+            Scenario.Step(Humanizer.Prefix(@"Then ", title), action.Bind(Actions).Bind(Scenario));
             return this;
         }
 
         [DebuggerHidden]
         public Component<TActions> And(string title, Func<TActions, Scenario, Task> action)
         {
-            Scenario.Step(@" and " + title, action.Bind(Actions).Bind(Scenario));
+            Scenario.Step(Humanizer.Prefix(@" and ", title), action.Bind(Actions).Bind(Scenario));
             return this;
         }
 

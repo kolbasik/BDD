@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
@@ -46,6 +48,54 @@ namespace NBDD.V2
         public static Component<TActions> Bind<TActions>(this Component<TActions> component, Action<TActions, Scenario> action)
         {
             return component.Bind(action.AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> Given<TActions>(this Component<TActions> component, Expression<Action<TActions, Scenario>> expression)
+        {
+            return component.Given(Humanizer.ToString(expression), expression.Compile().AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> When<TActions>(this Component<TActions> component, Expression<Action<TActions, Scenario>> expression)
+        {
+            return component.When(Humanizer.ToString(expression), expression.Compile().AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> Then<TActions>(this Component<TActions> component, Expression<Action<TActions, Scenario>> expression)
+        {
+            return component.Then(Humanizer.ToString(expression), expression.Compile().AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> And<TActions>(this Component<TActions> component, Expression<Action<TActions, Scenario>> expression)
+        {
+            return component.And(Humanizer.ToString(expression), expression.Compile().AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> Given<TActions>(this Component<TActions> component, Expression<Func<TActions, Scenario, Task>> expression)
+        {
+            return component.Given(Humanizer.ToString(expression), expression.Compile());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> When<TActions>(this Component<TActions> component, Expression<Func<TActions, Scenario, Task>> expression)
+        {
+            return component.When(Humanizer.ToString(expression), expression.Compile());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> Then<TActions>(this Component<TActions> component, Expression<Func<TActions, Scenario, Task>> expression)
+        {
+            return component.Then(Humanizer.ToString(expression), expression.Compile());
+        }
+
+        [DebuggerHidden]
+        public static Component<TActions> And<TActions>(this Component<TActions> component, Expression<Func<TActions, Scenario, Task>> expression)
+        {
+            return component.And(Humanizer.ToString(expression), expression.Compile());
         }
     }
 }
