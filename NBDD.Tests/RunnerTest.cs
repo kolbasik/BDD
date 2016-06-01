@@ -72,7 +72,7 @@ namespace NBDD.Tests
                 await Feature.PlayAsync();
 
                 // assert
-                Assert.Throws<ObjectDisposedException>(() => Feature.Container.Providers);
+                Assert.Throws<ObjectDisposedException>(() => Feature.Container.Composition.Providers);
             }
 
             [Fact]
@@ -86,8 +86,8 @@ namespace NBDD.Tests
                 await Feature.PlayAsync();
 
                 // assert
-                Assert.Throws<ObjectDisposedException>(() => scenario1.Container.Providers);
-                Assert.Throws<ObjectDisposedException>(() => scenario2.Container.Providers);
+                Assert.Throws<ObjectDisposedException>(() => scenario1.Container.Composition.Providers);
+                Assert.Throws<ObjectDisposedException>(() => scenario2.Container.Composition.Providers);
             }
 
             [Fact]

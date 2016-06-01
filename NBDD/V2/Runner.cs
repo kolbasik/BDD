@@ -11,18 +11,15 @@ namespace NBDD.V2
     [DebuggerStepThrough, DebuggerNonUserCode]
     public static class Runner
     {
-        public static readonly CompositionContainer Container;
-
         static Runner()
         {
-            Container = new CompositionContainer();
-            Container.Register(nameof(Runner), new Tracer(Bdd.Trace));
+            DI.Global.Register(nameof(Runner), new Tracer(Bdd.Trace));
         }
 
         [DebuggerHidden]
         public static Feature Feature()
         {
-            return new Feature(Container);
+            return new Feature(DI.Global);
         }
 
         [DebuggerHidden]
@@ -50,7 +47,7 @@ namespace NBDD.V2
             {
                 var stopwatch = Stopwatch.StartNew();
                 var logger = feature.Container.ResolveOrDefault<Tracer>() ??
-                             Container.Resolve<Tracer>(nameof(Runner));
+                             DI.Global.Resolve<Tracer>(nameof(Runner));
 
                 logger.Trace("Feature:");
                 logger.Trace("\tAs a " + feature.AsA);

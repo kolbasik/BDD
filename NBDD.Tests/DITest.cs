@@ -8,18 +8,18 @@ using Xunit;
 
 namespace NBDD.Tests
 {
-    public sealed class CompositionContainerTest
+    public sealed class DITest
     {
         public class TestBase
         {
             public TestBase()
             {
                 Fixture = new Fixture();
-                Container = new CompositionContainer();
+                Container = new DI(new CompositionContainer());
             }
 
             public Fixture Fixture { get; }
-            public CompositionContainer Container { get; }
+            public DI Container { get; }
         }
 
         public sealed class ScopeMethod : TestBase
@@ -42,10 +42,10 @@ namespace NBDD.Tests
             {
                 // arrage
                 var expect = new object();
-                Container.ComposeExportedValue(expect);
+                Container.Composition.ComposeExportedValue(expect);
 
                 // act
-                var actual = Container.Scope().GetExportedValue<object>();
+                var actual = Container.Scope().Composition.GetExportedValue<object>();
 
                 // assert
                 Assert.Same(expect, actual);
@@ -61,7 +61,7 @@ namespace NBDD.Tests
                 var expect = Fixture.CreateMany<int>().ToList();
 
                 // act
-                var actual = Container.Register<IList<int>>(expect).GetExportedValue<IList<int>>();
+                var actual = Container.Register<IList<int>>(expect).Composition.GetExportedValue<IList<int>>();
 
                 // assert
                 Assert.Same(expect, actual);
@@ -75,7 +75,7 @@ namespace NBDD.Tests
                 var expect = Fixture.CreateMany<int>().ToList();
 
                 // act
-                var actual = Container.Register<IList<int>>(name, expect).GetExportedValue<IList<int>>(name);
+                var actual = Container.Register<IList<int>>(name, expect).Composition.GetExportedValue<IList<int>>(name);
 
                 // assert
                 Assert.Same(expect, actual);
@@ -89,7 +89,7 @@ namespace NBDD.Tests
             {
                 // arrage
                 var expect = Fixture.CreateMany<int>().ToList();
-                Container.ComposeExportedValue<IList<int>>(expect);
+                Container.Composition.ComposeExportedValue<IList<int>>(expect);
 
                 // act
                 var actual = Container.Resolve<IList<int>>();
@@ -104,7 +104,7 @@ namespace NBDD.Tests
                 // arrage
                 var name = Fixture.Create<string>();
                 var expect = Fixture.CreateMany<int>().ToList();
-                Container.ComposeExportedValue<IList<int>>(name, expect);
+                Container.Composition.ComposeExportedValue<IList<int>>(name, expect);
 
                 // act
                 var actual = Container.Resolve<IList<int>>(name);
