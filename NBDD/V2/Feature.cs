@@ -8,7 +8,7 @@ namespace NBDD.V2
     [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Feature : IDisposable
     {
-        public Feature(CompositionContainer container)
+        public Feature(DI container)
         {
             Scenarios = new List<Scenario>();
             Container = container.Scope();
@@ -25,7 +25,7 @@ namespace NBDD.V2
         public string SoThat { get; set; }
 
         internal List<Scenario> Scenarios { get; }
-        public CompositionContainer Container { get; }
+        public DI Container { get; }
 
         [DebuggerHidden]
         public Scenario Scenario()

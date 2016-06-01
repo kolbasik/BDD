@@ -27,7 +27,7 @@ namespace NBDD.V2
 
         internal List<Unit> Units { get; }
         internal List<Component> Components { get; }
-        public CompositionContainer Container { get; }
+        public DI Container { get; }
         public Dictionary<string, object> Props { get; }
 
         [DebuggerHidden]

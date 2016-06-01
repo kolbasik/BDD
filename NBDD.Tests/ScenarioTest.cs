@@ -102,7 +102,7 @@ namespace NBDD.Tests
                 Scenario.Dispose();
 
                 // assert
-                Assert.Throws<ObjectDisposedException>(() => Scenario.Container.Providers);
+                Assert.Throws<ObjectDisposedException>(() => Scenario.Container.Composition.Providers);
             }
 
             [Fact]
