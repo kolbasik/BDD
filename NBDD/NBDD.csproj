@@ -53,6 +53,7 @@
     <Compile Include="V2\Feature.cs" />
     <Compile Include="V2\FeatureExtensions.cs" />
     <Compile Include="V2\FeatureResult.cs" />
+    <Compile Include="V2\Runner.cs" />
     <Compile Include="V2\ScenarioExtensions.cs" />
     <Compile Include="V2\StepResult.cs" />
     <Compile Include="V2\Scenario.cs" />

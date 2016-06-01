@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace NBDD.V2
 {
@@ -28,7 +29,25 @@ namespace NBDD.V2
         [DebuggerHidden]
         public static Scenario Bind(this Scenario scenario, Action<Scenario> bind)
         {
-            return scenario.Bind(bind.AsAsync());
+            return scenario.Bind(bind.Bind(scenario).AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Scenario Bind(this Scenario scenario, Func<Scenario, Task> bind)
+        {
+            return scenario.Bind(bind.Bind(scenario));
+        }
+
+        [DebuggerHidden]
+        public static Scenario Step(this Scenario scenario, string title, Action<Scenario> action)
+        {
+            return scenario.Step(title, action.Bind(scenario).AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Scenario Step(this Scenario scenario, string title, Func<Scenario, Task> action)
+        {
+            return scenario.Step(title, action.Bind(scenario));
         }
 
         [DebuggerHidden]

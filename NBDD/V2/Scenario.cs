@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NBDD.V2
@@ -32,9 +31,9 @@ namespace NBDD.V2
         public Dictionary<string, object> Props { get; }
 
         [DebuggerHidden]
-        public Scenario Bind(Func<Scenario, Task> bind)
+        public Scenario Bind(Func<Task> bind)
         {
-            Units.Add(new Bind(bind.Bind(this)));
+            Units.Add(new Bind(bind));
             return this;
         }
 
