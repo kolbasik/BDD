@@ -33,21 +33,21 @@ namespace OpenWeatherMapSpecs.V2
                         .Bind(s => s.Prop(@"CountryCode", countryCode))
 
                         .Use<TheWeatherByCityNameActions>()
-                        .Given(@"the city is $CityName", (x, s) => x.CityName = s.Prop<string>(@"CityName"))
-                        .And(@"the country is $CountryCode", (x, s) => x.CountryCode = s.Prop<string>(@"CountryCode"))
+                        .Given(@"the city name is $CityName", (x, s) => x.CityName = s.Prop<string>(@"CityName"))
+                        .And(@"the country code is $CountryCode", (x, s) => x.CountryCode = s.Prop<string>(@"CountryCode"))
                         .When((x, s) => x.When_I_have_asked_the_forecast())
                         .Then((x, s) => x.It_should_contain_the_city_id())
                         .Bind((x, s) => s.Prop(@"CityID", x.Forecast.Id))
 
                         .Use<TheWeatherByCityIDActions>()
-                        .Given(@"the city is $CityID", (x, s) => x.CityID = s.Prop<string>(@"CityID"))
+                        .Given(@"the city id is $CityID", (x, s) => x.CityID = s.Prop<string>(@"CityID"))
                         .When((x, s) => x.When_I_have_asked_the_forecast())
                         .Then((x, s) => x.It_should_contain_the_city_id())
                         .Bind((x, s) => s.Prop(@"Forecast", x.Forecast))
 
                         .Use<TheWeatherForecastResultActions>()
                         .Given(@"The forecast", (x, s) => x.Forecast = s.Prop<OpenWeatherMapForecast>(@"Forecast"))
-                        .Then(@"it should contain the $CityName city name", (x, s) => x.It_should_contain_the_city_name(s.Prop<string>(@"CityName")))
+                        .Then((x, s) => x.It_should_contain_the_city_name(s.Prop<string>(@"CityName")))
                         .And((x, s) => x.It_should_contain_the_coordinates())
                         .And((x, s) => x.It_should_contain_the_main_information())
                         .And((x, s) => x.It_should_contain_the_wheather_information());

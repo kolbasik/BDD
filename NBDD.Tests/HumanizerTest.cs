@@ -96,6 +96,45 @@ namespace NBDD.Tests
                 // assert
                 Assert.Equal(expect, actual);
             }
+
+            [Fact]
+            public void Should_include_the_list_of_parameters_binded_using_Prop_method()
+            {
+                // arrange
+                var expect = @"it should take the parameters: arg1='$ARG1', arg2='$ARG2'";
+
+                // act
+                var actual = Humanizer.ToString<Actions>((x, s) => x.It_should_take_the_parameters(s.Prop<int>(@"ARG1"), s.Prop<object>(@"ARG2")));
+
+                // assert
+                Assert.Equal(expect, actual);
+            }
+
+            [Fact]
+            public void Should_include_the_list_of_parameters_binded_using_Props()
+            {
+                // arrange
+                var expect = @"it should take the parameters: arg1='$ARG1', arg2='$ARG2'";
+
+                // act
+                var actual = Humanizer.ToString<Actions>((x, s) => x.It_should_take_the_parameters((int) s.Props[@"ARG1"], s.Props[@"ARG2"]));
+
+                // assert
+                Assert.Equal(expect, actual);
+            }
+
+            [Fact]
+            public void It_should_redefine_the_parameters_according_to_bindings()
+            {
+                // arrange
+                var expect = @"it should be defined as arg1=$T1 and arg2=$T2";
+
+                // act
+                var actual = Humanizer.ToString<Actions>((x, s) => x.It_should_redefine_the_parameters_according_to_bindings(s.Props[@"T1"], s.Props[@"T2"]));
+
+                // assert
+                Assert.Equal(expect, actual);
+            }
         }
 
         private class Actions
@@ -104,7 +143,7 @@ namespace NBDD.Tests
             {
             }
 
-            [Description("~ It should take the description text ~")]
+            [Description(@"~ It should take the description text ~")]
             public void It_should_take_the_description_text()
             {
             }
@@ -114,10 +153,19 @@ namespace NBDD.Tests
                 return Task.CompletedTask;;
             }
 
-            [Description("~ It should take the description text ~")]
+            [Description(@"~ It should take the description text ~")]
             public Task It_should_take_the_description_text_async()
             {
                 return Task.CompletedTask;
+            }
+
+            public void It_should_take_the_parameters(int arg1, object arg2)
+            {
+            }
+
+            [Description(@"it should be defined as arg1=$arg1 and arg2=$arg2")]
+            public void It_should_redefine_the_parameters_according_to_bindings(object arg1, object arg2)
+            {
             }
         }
     }

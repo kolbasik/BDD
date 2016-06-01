@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -12,7 +15,7 @@ namespace NBDD.V2
     {
         public static string ToString<T>(Expression<Func<T, Scenario, Task>> expression)
         {
-            return ToString((LambdaExpression)expression);
+            return ToString((LambdaExpression) expression);
         }
 
         public static string ToString<T>(Expression<Action<T, Scenario>> expression)
@@ -28,15 +31,78 @@ namespace NBDD.V2
             if (methodCallExpression != null)
             {
                 var method = methodCallExpression.Method;
+                var arguments = methodCallExpression.Arguments;
+                var parameters = method.GetParameters();
+
+                var kvps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (var i = 0; i < arguments.Count; i++)
+                {
+                    var argument = arguments[i];
+                    var propCall = argument as MethodCallExpression;
+                    if (propCall != null && string.Equals(@"Prop", propCall.Method.Name) &&
+                        propCall.Method.IsDefined(typeof (ExtensionAttribute), true))
+                    {
+                        if (propCall.Arguments.Count == 2)
+                        {
+                            var constant = propCall.Arguments[1] as ConstantExpression;
+                            if (constant != null)
+                            {
+                                kvps[parameters[i].Name] = (string) constant.Value;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var unaryExpression = argument as UnaryExpression;
+                        if (unaryExpression != null && unaryExpression.NodeType == ExpressionType.Convert)
+                        {
+                            argument = unaryExpression.Operand;
+                        }
+                        var dictCall = argument as MethodCallExpression;
+                        if (dictCall != null && string.Equals(@"get_Item", dictCall.Method.Name))
+                        {
+                            var member = dictCall.Object as MemberExpression;
+                            if (member != null && string.Equals(@"Props", member.Member.Name))
+                            {
+                                if (dictCall.Arguments.Count == 1)
+                                {
+                                    var constant = dictCall.Arguments[0] as ConstantExpression;
+                                    if (constant != null)
+                                    {
+                                        kvps[parameters[i].Name] = (string) constant.Value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                string title;
                 var description = method.GetCustomAttribute<DescriptionAttribute>();
                 if (description != null)
                 {
-                    return description.Description;
+                    title = description.Description;
+                    title = Regex.Replace(title, @"\$(?<name>\w+)", match =>
+                    {
+                        string value;
+                        return kvps.TryGetValue(match.Groups[@"name"].Value, out value)
+                            ? @"$" + value
+                            : match.Value;
+                    });
                 }
-                return Humanize(method.Name);
+                else
+                {
+                    title = Humanize(method.Name);
+                    if (kvps.Count > 0)
+                    {
+                        var values = kvps.Select(x => $"{x.Key}='${x.Value}'");
+                        title = $@"{title}: {string.Join(@", ", values)}";
+                    }
+                }
+                return title;
             }
-
-            throw new NotSupportedException(string.Format(@"The format of expression is not supported. {0}", lambdaExpression));
+            var message = string.Format(@"The format of expression is not supported. {0}", lambdaExpression);
+            throw new NotSupportedException(message);
         }
 
         public static string Humanize(string title)
