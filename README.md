@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/40xwv599e9q5utxb/branch/master?svg=true)](https://ci.appveyor.com/project/kolbasik/nbdd/branch/master)
+
 # BDD
 Tests with BDD style using reusable components
 
