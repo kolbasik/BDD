@@ -2,11 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using NBDD.V2;
 using Ploeh.AutoFixture;
 using Xunit;
 
-namespace NBDD.Tests
+namespace NBDD.V2.Tests
 {
     public sealed class ScenarioTest
     {

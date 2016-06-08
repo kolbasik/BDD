@@ -1,9 +1,8 @@
 ﻿using System;
-using NBDD.V2;
 using Ploeh.AutoFixture;
 using Xunit;
 
-namespace NBDD.Tests
+namespace NBDD.V2.Tests
 {
     public sealed class FeatureTest
     {

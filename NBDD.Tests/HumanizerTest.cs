@@ -1,9 +1,8 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
-using NBDD.V2;
 using Xunit;
 
-namespace NBDD.Tests
+namespace NBDD.V2.Tests
 {
     public sealed class HumanizerTest
     {
@@ -151,7 +150,7 @@ namespace NBDD.Tests
 
             public Task It_should_take_the_method_name_async()
             {
-                return Task.CompletedTask;;
+                return Task.CompletedTask;
             }
 
             [Description(@"~ It should take the description text ~")]
