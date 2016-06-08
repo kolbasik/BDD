@@ -51,6 +51,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="GetTheWeatherByCityIDSpec.cs" />
     <Compile Include="GetTheWeatherByCityNameSpec.cs" />
     <Compile Include="GetTheWeatherByGeographicCoordinatesSpec.cs" />
