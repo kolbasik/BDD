@@ -16,7 +16,7 @@ namespace OpenWeatherMapSpecs.V2.Specs
 
         public OpenWeatherMapForecast Forecast { get; private set; }
 
-        public async Task When_I_have_asked_the_forecast()
+        public async Task I_have_asked_the_forecast()
         {
             Forecast = await OpenWeatherMapService.GetWeatherForecastAsync(Lat, Lon).ConfigureAwait(false);
             Assert.NotNull(Forecast);

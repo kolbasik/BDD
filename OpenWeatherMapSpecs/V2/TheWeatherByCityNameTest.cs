@@ -37,7 +37,7 @@ namespace OpenWeatherMapSpecs.V2
                         .Use<TheWeatherByCityNameActions>()
                         .Given(@"the city is $CityName", (x, s) => x.CityName = (string) s.Props[@"CityName"])
                         .And(@"the country is $CountryCode", (x, s) => x.CountryCode = (string) s.Props[@"CountryCode"])
-                        .When(@"I have asked the forecast", (x, s) => x.When_I_have_asked_the_forecast())
+                        .When(@"I have asked the forecast", (x, s) => x.I_have_asked_the_forecast())
                         .Then(@"it should contain the city name", (x, s) => x.It_should_contain_the_city_name())
                         .Bind((x, s) => s.Props[@"Forecast"] = x.Forecast)
 

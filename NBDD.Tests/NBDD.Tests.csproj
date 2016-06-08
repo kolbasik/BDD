@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HumanizerTest.cs" />
     <Compile Include="DITest.cs" />
     <Compile Include="FeatureTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

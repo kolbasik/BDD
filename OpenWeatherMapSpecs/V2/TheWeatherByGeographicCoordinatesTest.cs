@@ -36,7 +36,7 @@ namespace OpenWeatherMapSpecs.V2
                         .Use<TheWeatherByCityNameActions>()
                         .Given(@"the city is $CityName", (x, s) => x.CityName = s.Prop<string>(@"CityName"))
                         .And(@"the country is $CountryCode", (x, s) => x.CountryCode = s.Prop<string>(@"CountryCode"))
-                        .When(@"I have asked the forecast", (x, s) => x.When_I_have_asked_the_forecast())
+                        .When(@"I have asked the forecast", (x, s) => x.I_have_asked_the_forecast())
                         .Then(@"it should contain the geographic coordinates", (x, s) => x.It_should_contain_the_geographic_coordinates())
                         .Bind((x, s) => s.Prop(@"Lat", x.Forecast.Coord.Lat))
                         .Bind((x, s) => s.Prop(@"Lon", x.Forecast.Coord.Lon))
@@ -44,7 +44,7 @@ namespace OpenWeatherMapSpecs.V2
                         .Use<TheWeatherByGeographicCoordinatesActions>()
                         .Given(@"the geographic coordinates lat is $Lat", (x, s) => x.Lat = s.Prop<decimal>(@"Lat"))
                         .And(@"the geographic coordinates lon is $Lon", (x, s) => x.Lon = s.Prop<decimal>(@"Lon"))
-                        .When(@"I have asked the forecast", (x, s) => x.When_I_have_asked_the_forecast())
+                        .When(@"I have asked the forecast", (x, s) => x.I_have_asked_the_forecast())
                         .Then(@"it should contain the city id", (x, s) => x.It_should_contain_the_geographic_coordinates())
                         .Bind((x, s) => s.Prop(@"Forecast", x.Forecast))
 
