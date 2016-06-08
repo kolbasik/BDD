@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>kolbasik.NBDD</id>
+    <title>NBDD</title>
+    <description>NBDD</description>
+    <authors>Sergii Kolbasin</authors>
+    <copyright>Copyright 2016</copyright>
+    <projectUrl>https://github.com/kolbasik/NBDD</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/kolbasik/NBDD/master/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+  </metadata>
+</package>
