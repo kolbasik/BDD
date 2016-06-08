@@ -61,7 +61,7 @@ namespace NBDD.V2
                 delegate(Match match)
                 {
                     var name = match.Groups[@"Prop"].Value;
-                    return Convert.ToString(scenario.Prop<object>(name)) ?? match.Value;
+                    return scenario.Prop<object>(name)?.ToString() ?? match.Value;
                 });
             return title;
         }
