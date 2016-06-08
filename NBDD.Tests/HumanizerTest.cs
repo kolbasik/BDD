@@ -12,6 +12,7 @@ namespace NBDD.Tests
             [Theory]
             [InlineData("", null)]
             [InlineData("", "")]
+            [InlineData("custom test parameter", "customTestParameter")]
             [InlineData("i have run the test", "IHaveRunTheTest")]
             [InlineData("i have run the test", "I_Have_Run_The_Test")]
             [InlineData("i have run the test", "I__have__Run__the__Test")]

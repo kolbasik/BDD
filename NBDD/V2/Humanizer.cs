@@ -108,7 +108,7 @@ namespace NBDD.V2
         public static string Humanize(string title)
         {
             var humanized = title ?? string.Empty;
-            humanized = Regex.Replace(humanized, @"([A-Z][a-z]*)", @"$1 ").ToLowerInvariant();
+            humanized = Regex.Replace(humanized, @"([A-Z][a-z]*)", @" $1").ToLowerInvariant();
             humanized = Regex.Replace(humanized, @"(\s|_)+", @" ").Trim();
             return humanized;
         }
