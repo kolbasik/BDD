@@ -64,7 +64,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,13 +78,13 @@
     <Compile Include="TheWeatherByGeographicCoordinatesTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OpenWeatherMap\OpenWeatherMap.csproj">
+      <Project>{5b98b889-9f73-4351-978e-8799faf6d734}</Project>
+      <Name>OpenWeatherMap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NBDD\NBDD.csproj">
       <Project>{6185c17e-9d45-4af6-a249-e2484c308d8f}</Project>
       <Name>NBDD</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenWeatherMap\OpenWeatherMap.csproj">
-      <Project>{5b98b889-9f73-4351-978e-8799faf6d734}</Project>
-      <Name>OpenWeatherMap</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

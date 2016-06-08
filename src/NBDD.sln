@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD", "NBDD\NBDD.csproj", "{6185C17E-9D45-4AF6-A249-E2484C308D8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD", "V2\NBDD\NBDD.csproj", "{6185C17E-9D45-4AF6-A249-E2484C308D8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMapSpecs", "OpenWeatherMapSpecs\OpenWeatherMapSpecs.csproj", "{2A67A1C1-0733-42DB-BA5F-227AB34B8220}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMapSpecs", "V2\OpenWeatherMapSpecs\OpenWeatherMapSpecs.csproj", "{2A67A1C1-0733-42DB-BA5F-227AB34B8220}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMap", "OpenWeatherMap\OpenWeatherMap.csproj", "{5B98B889-9F73-4351-978E-8799FAF6D734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD.Tests", "NBDD.Tests\NBDD.Tests.csproj", "{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD.Tests", "V2\NBDD.Tests\NBDD.Tests.csproj", "{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{754FB47B-87C3-4E73-BCEE-277B45180161}"
 EndProject
