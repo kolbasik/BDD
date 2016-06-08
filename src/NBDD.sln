@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD", "V2\NBDD\NBDD.csproj", "{6185C17E-9D45-4AF6-A249-E2484C308D8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMapSpecs", "V2\OpenWeatherMapSpecs\OpenWeatherMapSpecs.csproj", "{2A67A1C1-0733-42DB-BA5F-227AB34B8220}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMap", "OpenWeatherMap\OpenWeatherMap.csproj", "{5B98B889-9F73-4351-978E-8799FAF6D734}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD.Tests", "V2\NBDD.Tests\NBDD.Tests.csproj", "{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{754FB47B-87C3-4E73-BCEE-277B45180161}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V2", "V2", "{DE17368A-C419-46F4-98A9-0BF962C3C610}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBDD", "V1\NBDD\NBDD.csproj", "{E3D767DE-341F-48D8-9746-A5ADBAA875CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWeatherMapSpecs", "V1\OpenWeatherMapSpecs\OpenWeatherMapSpecs.csproj", "{A88DD809-4C2C-41FC-96C1-5AB0C8936493}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{EE992A42-2D2E-4703-93EC-08FA316AED39}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6185C17E-9D45-4AF6-A249-E2484C308D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6185C17E-9D45-4AF6-A249-E2484C308D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6185C17E-9D45-4AF6-A249-E2484C308D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6185C17E-9D45-4AF6-A249-E2484C308D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A67A1C1-0733-42DB-BA5F-227AB34B8220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A67A1C1-0733-42DB-BA5F-227AB34B8220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A67A1C1-0733-42DB-BA5F-227AB34B8220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A67A1C1-0733-42DB-BA5F-227AB34B8220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B98B889-9F73-4351-978E-8799FAF6D734}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B98B889-9F73-4351-978E-8799FAF6D734}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B98B889-9F73-4351-978E-8799FAF6D734}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B98B889-9F73-4351-978E-8799FAF6D734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3D767DE-341F-48D8-9746-A5ADBAA875CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3D767DE-341F-48D8-9746-A5ADBAA875CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3D767DE-341F-48D8-9746-A5ADBAA875CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3D767DE-341F-48D8-9746-A5ADBAA875CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A88DD809-4C2C-41FC-96C1-5AB0C8936493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A88DD809-4C2C-41FC-96C1-5AB0C8936493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A88DD809-4C2C-41FC-96C1-5AB0C8936493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A88DD809-4C2C-41FC-96C1-5AB0C8936493}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6185C17E-9D45-4AF6-A249-E2484C308D8F} = {DE17368A-C419-46F4-98A9-0BF962C3C610}
+		{2A67A1C1-0733-42DB-BA5F-227AB34B8220} = {DE17368A-C419-46F4-98A9-0BF962C3C610}
+		{89A6D0D4-2476-4D31-A6E8-A895F69C9B8B} = {DE17368A-C419-46F4-98A9-0BF962C3C610}
+		{E3D767DE-341F-48D8-9746-A5ADBAA875CE} = {754FB47B-87C3-4E73-BCEE-277B45180161}
+		{A88DD809-4C2C-41FC-96C1-5AB0C8936493} = {754FB47B-87C3-4E73-BCEE-277B45180161}
+	EndGlobalSection
+EndGlobal
