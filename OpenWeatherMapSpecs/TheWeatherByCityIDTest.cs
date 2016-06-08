@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using NBDD.V2;
 using OpenWeatherMap;
-using OpenWeatherMapSpecs.V2.Specs;
+using OpenWeatherMapSpecs.Specs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace OpenWeatherMapSpecs.V2
+namespace OpenWeatherMapSpecs
 {
     public class TheWeatherByCityIDTest : OpenWeatherMapServiceTest
     {

@@ -1,7 +1,7 @@
 using System;
 using OpenWeatherMap;
 
-namespace OpenWeatherMapSpecs.V2
+namespace OpenWeatherMapSpecs
 {
     public abstract class OpenWeatherMapServiceTest : IDisposable
     {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using OpenWeatherMap;
 using Xunit;
 
-namespace OpenWeatherMapSpecs.V2.Specs
+namespace OpenWeatherMapSpecs.Specs
 {
     [Export]
     public sealed class TheWeatherByCityIDActions
