@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A67A1C1-0733-42DB-BA5F-227AB34B8220}</ProjectGuid>
+    <ProjectGuid>{A88DD809-4C2C-41FC-96C1-5AB0C8936493}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenWeatherMapSpecs</RootNamespace>
@@ -26,7 +26,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,30 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.assert, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.assert.2.1.0\lib\dotnet\xunit.assert.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.core, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -68,34 +44,33 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise />
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+      </ItemGroup>
+    </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="GetTheWeatherByCityIDSpec.cs" />
+    <Compile Include="GetTheWeatherByCityNameSpec.cs" />
+    <Compile Include="GetTheWeatherByGeographicCoordinatesSpec.cs" />
+    <Compile Include="Common\MsSpec.cs" />
+    <Compile Include="OpenWeatherMapServiceSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OpenWeatherMapServiceTest.cs" />
-    <Compile Include="Specs\TheWeatherByGeographicCoordinatesActions.cs" />
-    <Compile Include="Specs\TheWeatherByCityIDActions.cs" />
-    <Compile Include="TheWeatherByCityIDTest.cs" />
-    <Compile Include="TheWeatherByCityNameTest.cs" />
-    <Compile Include="Specs\TheWeatherByCityNameActions.cs" />
-    <Compile Include="Specs\TheWeatherForecastResultActions.cs" />
-    <Compile Include="TheWeatherByGeographicCoordinatesTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NBDD\NBDD.csproj">
-      <Project>{6185c17e-9d45-4af6-a249-e2484c308d8f}</Project>
-      <Name>NBDD</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenWeatherMap\OpenWeatherMap.csproj">
+    <ProjectReference Include="..\..\OpenWeatherMap\OpenWeatherMap.csproj">
       <Project>{5b98b889-9f73-4351-978e-8799faf6d734}</Project>
       <Name>OpenWeatherMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NBDD\NBDD.csproj">
+      <Project>{e3d767de-341f-48d8-9746-a5adbaa875ce}</Project>
+      <Name>NBDD</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

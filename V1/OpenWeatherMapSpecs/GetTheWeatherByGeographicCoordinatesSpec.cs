@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NBDD.V1;
 
-namespace OpenWeatherMapSpecs.V1
+namespace OpenWeatherMapSpecs
 {
     [TestClass]
     public class GetTheWeatherByGeographicCoordinatesSpec : OpenWeatherMapServiceSpec<GetTheWeatherByGeographicCoordinatesSpec>
@@ -36,7 +36,7 @@ namespace OpenWeatherMapSpecs.V1
         [Bdd.Then]
         public void And_the_forecast_will_have_the_city_name()
         {
-            Assert.AreEqual(CityName, Result.Name);
+            Assert.AreEqual<string>(CityName, Result.Name);
         }
 
         [Bdd.Then]
