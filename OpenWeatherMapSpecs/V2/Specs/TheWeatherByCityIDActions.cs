@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using OpenWeatherMap;
@@ -15,7 +16,17 @@ namespace OpenWeatherMapSpecs.V2.Specs
 
         public OpenWeatherMapForecast Forecast { get; private set; }
 
-        public async Task When_I_have_asked_the_forecast()
+        public void Set(string cityId)
+        {
+            if (cityId == null)
+            {
+                throw new ArgumentNullException(nameof(cityId));
+            }
+
+            CityID = cityId;
+        }
+
+        public async Task I_have_asked_the_forecast()
         {
             Forecast = await OpenWeatherMapService.GetWeatherForecastAsync(CityID).ConfigureAwait(false);
             Assert.NotNull(Forecast);

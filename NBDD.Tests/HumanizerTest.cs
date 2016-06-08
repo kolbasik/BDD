@@ -102,7 +102,7 @@ namespace NBDD.Tests
             public void Should_include_the_list_of_parameters_binded_using_Prop_method()
             {
                 // arrange
-                var expect = @"it should take the parameters: arg1='$ARG1', arg2='$ARG2'";
+                var expect = @"it should take the parameters (arg 1: '$ARG1', arg 2: '$ARG2')";
 
                 // act
                 var actual = Humanizer.ToString<Actions>((x, s) => x.It_should_take_the_parameters(s.Prop<int>(@"ARG1"), s.Prop<object>(@"ARG2")));
@@ -115,7 +115,7 @@ namespace NBDD.Tests
             public void Should_include_the_list_of_parameters_binded_using_Props()
             {
                 // arrange
-                var expect = @"it should take the parameters: arg1='$ARG1', arg2='$ARG2'";
+                var expect = @"it should take the parameters (arg 1: '$ARG1', arg 2: '$ARG2')";
 
                 // act
                 var actual = Humanizer.ToString<Actions>((x, s) => x.It_should_take_the_parameters((int) s.Props[@"ARG1"], s.Props[@"ARG2"]));

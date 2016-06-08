@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using OpenWeatherMap;
 using Xunit;
 
@@ -8,6 +9,16 @@ namespace OpenWeatherMapSpecs.V2.Specs
     public sealed class TheWeatherForecastResultActions
     {
         public OpenWeatherMapForecast Forecast { get; set; }
+
+        public void Set(OpenWeatherMapForecast forecast)
+        {
+            if (forecast == null)
+            {
+                throw new ArgumentNullException(nameof(forecast));
+            }
+
+            Forecast = forecast;
+        }
 
         public void It_should_contain_the_city_id(string cityId)
         {

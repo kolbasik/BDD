@@ -16,7 +16,13 @@ namespace OpenWeatherMapSpecs.V2.Specs
 
         public OpenWeatherMapForecast Forecast { get; private set; }
 
-        public async Task When_I_have_asked_the_forecast()
+        public void Set(string cityName, string countryCode)
+        {
+            CityName = cityName;
+            CountryCode = countryCode;
+        }
+
+        public async Task I_have_asked_the_forecast()
         {
             Forecast = await OpenWeatherMapService.GetWeatherForecastAsync(CityName, CountryCode).ConfigureAwait(false);
             Assert.NotNull(Forecast);

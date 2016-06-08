@@ -95,8 +95,8 @@ namespace NBDD.V2
                     title = Humanize(method.Name);
                     if (kvps.Count > 0)
                     {
-                        var values = kvps.Select(x => $"{x.Key}='${x.Value}'");
-                        title = $@"{title}: {string.Join(@", ", values)}";
+                        var values = kvps.Select(x => $"{Humanize(x.Key)}: '${x.Value}'");
+                        title = $@"{title} ({string.Join(@", ", values)})";
                     }
                 }
                 return title;
@@ -108,7 +108,7 @@ namespace NBDD.V2
         public static string Humanize(string title)
         {
             var humanized = title ?? string.Empty;
-            humanized = Regex.Replace(humanized, @"([A-Z][a-z]*)", @" $1").ToLowerInvariant();
+            humanized = Regex.Replace(humanized, @"([A-Z0-9])", @" $1").ToLowerInvariant();
             humanized = Regex.Replace(humanized, @"(\s|_)+", @" ").Trim();
             return humanized;
         }

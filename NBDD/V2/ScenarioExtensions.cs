@@ -21,6 +21,10 @@ namespace NBDD.V2
             object value;
             if (scenario.Props.TryGetValue(name, out value))
             {
+                if (value is T)
+                {
+                    return (T) value;
+                }
                 return (T)Convert.ChangeType(value, typeof(T));
             }
             return default(T);
@@ -57,7 +61,7 @@ namespace NBDD.V2
                 delegate(Match match)
                 {
                     var name = match.Groups[@"Prop"].Value;
-                    return scenario.Prop<string>(name) ?? match.Value;
+                    return Convert.ToString(scenario.Prop<object>(name)) ?? match.Value;
                 });
             return title;
         }
