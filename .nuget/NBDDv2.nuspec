@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>kolbasik.NBDD.v2</id>
+    <id>kolbasik.NBDDv2</id>
     <version>$Version$</version>
     <title>NBDD V2</title>
     <description>NBDD V2</description>
