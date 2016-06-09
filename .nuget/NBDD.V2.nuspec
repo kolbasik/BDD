@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>kolbasik.NBDDv2</id>
-    <version>$(version)</version>
-    <title>kolbasik.NBDDv2</title>
+    <id>kolbasik.NBDD.v2</id>
+    <version>$Version$</version>
+    <title>NBDD V2</title>
     <description>NBDD V2</description>
     <authors>Sergii Kolbasin</authors>
     <copyright>Copyright 2016</copyright>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
   </metadata>
   <files>
-    <file src="bin\$(configuration)\NBDD\*.pdb" target="lib\net461\" />
-    <file src="bin\$(configuration)\NBDD\*.dll" target="lib\net461\" />
+    <file src="bin\$Configuration$\NBDD\*.pdb" target="lib\net461\" />
+    <file src="bin\$Configuration$\NBDD\*.dll" target="lib\net461\" />
   </files>
 </package>
