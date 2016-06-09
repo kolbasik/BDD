@@ -56,7 +56,6 @@
     <Compile Include="StepResult.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="ScenarioResult.cs" />
-    <Compile Include="StepType.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Step.cs" />
   </ItemGroup>

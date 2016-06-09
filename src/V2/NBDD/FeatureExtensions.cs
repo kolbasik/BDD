@@ -7,13 +7,6 @@ namespace NBDD.V2
     public static class FeatureExtensions
     {
         [DebuggerHidden]
-        public static Feature UseBdd<TService>(this Feature feature)
-        {
-            var service = feature.Container.Resolve<TService>(nameof(Bdd));
-            return feature.Use(service);
-        }
-
-        [DebuggerHidden]
         public static Feature UseTrace(this Feature feature, Action<string> trace)
         {
             return feature.Use(new Logger(trace));
