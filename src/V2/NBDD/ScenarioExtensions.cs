@@ -31,15 +31,27 @@ namespace NBDD.V2
         }
 
         [DebuggerHidden]
-        public static Scenario Bind(this Scenario scenario, Action<Scenario> bind)
+        public static Scenario Bind(this Scenario scenario, Action action)
         {
-            return scenario.Bind(bind.Bind(scenario).AsAsync());
+            return scenario.Bind(action.AsAsync());
         }
 
         [DebuggerHidden]
-        public static Scenario Bind(this Scenario scenario, Func<Scenario, Task> bind)
+        public static Scenario Bind(this Scenario scenario, Action<Scenario> action)
         {
-            return scenario.Bind(bind.Bind(scenario));
+            return scenario.Bind(action.Bind(scenario).AsAsync());
+        }
+
+        [DebuggerHidden]
+        public static Scenario Bind(this Scenario scenario, Func<Scenario, Task> action)
+        {
+            return scenario.Bind(action.Bind(scenario));
+        }
+
+        [DebuggerHidden]
+        public static Scenario Step(this Scenario scenario, string title, Action action)
+        {
+            return scenario.Step(title, action.AsAsync());
         }
 
         [DebuggerHidden]

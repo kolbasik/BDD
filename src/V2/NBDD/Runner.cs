@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -13,13 +12,7 @@ namespace NBDD.V2
     {
         static Runner()
         {
-            DI.Global.Register(nameof(Runner), new Tracer(Bdd.Trace));
-        }
-
-        [DebuggerHidden]
-        public static Feature Feature()
-        {
-            return new Feature(DI.Global);
+            DI.Global.Register(nameof(Runner), new Logger(Bdd.Trace));
         }
 
         [DebuggerHidden]
@@ -43,68 +36,44 @@ namespace NBDD.V2
         [DebuggerHidden]
         public static async Task<FeatureResult> PlayAsync(this Feature feature)
         {
+            var tracing = new RunnerTracing(Resolve<Logger>(feature.Container));
+            tracing.FeatureEnter(feature);
             using (feature)
             {
-                var stopwatch = Stopwatch.StartNew();
-                var logger = feature.Container.ResolveOrDefault<Tracer>() ??
-                             DI.Global.Resolve<Tracer>(nameof(Runner));
-
-                logger.Trace("Feature:");
-                logger.Trace("\tAs a " + feature.AsA);
-                logger.Trace("\tI want " + feature.IWant);
-                logger.Trace("\tSo that " + feature.SoThat);
-
                 var featureResult = new FeatureResult(feature);
                 foreach (var scenario in feature.Scenarios)
                 {
+                    tracing.ScenarioEnter(scenario);
                     using (scenario)
                     {
                         var skip = false;
-                        logger.Trace($"{Environment.NewLine}Scenario:");
                         var scenarioResult = new ScenarioResult(scenario);
-                        foreach (var unit in scenario.Units)
+                        foreach (var step in scenario.Steps)
                         {
-                            var step = unit as Step;
-                            if (step != null)
+                            if (!string.IsNullOrEmpty(step.Title))
                             {
+                                tracing.StepEnter(step);
                                 if (skip)
                                 {
-                                    scenarioResult.Steps.Add(new StepResult(null, scenario.Transform(step.Title), null));
+                                    scenarioResult.Steps.Add(StepResult.Skip(scenario.Transform(step.Title)));
                                 }
                                 else
                                 {
-                                    stopwatch.Restart();
+                                    var stopwatch = Stopwatch.StartNew();
                                     try
                                     {
-                                        await unit.Action.Invoke().ConfigureAwait(false);
-                                        scenarioResult.Steps.Add(new StepResult(true, scenario.Transform(step.Title),
-                                            stopwatch.Elapsed));
+                                        await step.Action.Invoke().ConfigureAwait(false);
+                                        scenarioResult.Steps.Add(StepResult.Done(scenario.Transform(step.Title), stopwatch.Elapsed));
                                     }
                                     catch (Exception ex)
                                     {
                                         skip = true;
-                                        if (ex is TargetInvocationException)
-                                        {
-                                            ex = ex.InnerException;
-                                        }
-                                        scenarioResult.Exception = ex;
-                                        scenarioResult.Steps.Add(new StepResult(false, scenario.Transform(step.Title),
-                                            stopwatch.Elapsed));
+                                        scenarioResult.Exception = HandleException(ex);
+                                        scenarioResult.Steps.Add(StepResult.Fail(scenario.Transform(step.Title), stopwatch.Elapsed));
                                     }
                                 }
                                 var stepResult = scenarioResult.Steps.Last();
-                                if (stepResult.Name.StartsWith(@"Given", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    logger.Trace(string.Empty);
-                                }
-                                logger.Trace(string.Format("\t{0} {1} {2}",
-                                    stepResult.Name,
-                                    stepResult.Success.HasValue
-                                        ? (stepResult.Success.Value ? @"PASSED" : @"FAILED")
-                                        : string.Empty,
-                                    stepResult.Elapsed.HasValue
-                                        ? stepResult.Elapsed.Value.TotalMilliseconds.ToString(@"F1") + @"ms"
-                                        : null));
+                                tracing.StepExit(step, stepResult);
                             }
                             else
                             {
@@ -116,26 +85,37 @@ namespace NBDD.V2
                                 {
                                     try
                                     {
-                                        await unit.Action.Invoke().ConfigureAwait(false);
+                                        await step.Action.Invoke().ConfigureAwait(false);
                                     }
                                     catch (Exception ex)
                                     {
                                         skip = true;
-                                        if (ex is TargetInvocationException)
-                                        {
-                                            ex = ex.InnerException;
-                                        }
-                                        scenarioResult.Exception = ex;
+                                        scenarioResult.Exception = HandleException(ex);
                                     }
                                 }
                             }
                         }
-                        logger.Trace($"{Environment.NewLine}{scenarioResult.Exception}");
+                        tracing.ScenarioExit(scenario, scenarioResult);
                         featureResult.Scenarios.Add(scenarioResult);
                     }
                 }
+                tracing.FeatureExit(feature, featureResult);
                 return featureResult;
             }
+        }
+
+        private static T Resolve<T>(DI container) where T : class
+        {
+            return container.ResolveOrDefault<T>() ?? DI.Global.Resolve<T>(nameof(Runner));
+        }
+
+        private static Exception HandleException(Exception ex)
+        {
+            if (ex is TargetInvocationException)
+            {
+                ex = ex.InnerException;
+            }
+            return ex;
         }
     }
 }

@@ -8,6 +8,10 @@ namespace NBDD.V2
     [DebuggerStepThrough, DebuggerNonUserCode]
     public sealed class Feature : IDisposable
     {
+        public Feature() : this(DI.Global)
+        {
+        }
+
         public Feature(DI container)
         {
             Scenarios = new List<Scenario>();

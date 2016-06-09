@@ -39,17 +39,19 @@ namespace NBDD.V2.Tests
             }
 
             [Fact]
-            public void Should_register_the_action_in_the_scenario_units()
+            public void Should_register_the_action_in_the_scenario()
             {
                 // arrange
+                var title = string.Empty;
                 var expect = new Func<Task>(() => Task.CompletedTask);
 
                 // act
-                var unit = Scenario.Bind(expect).Units.Single();
-                var actual = Assert.IsType<Bind>(unit);
+                var unit = Scenario.Bind(expect).Steps.Single();
+                var actual = Assert.IsType<Step>(unit);
 
                 // assert
                 Assert.Same(expect, actual.Action);
+                Assert.Equal(title, actual.Title);
             }
         }
 
@@ -69,14 +71,14 @@ namespace NBDD.V2.Tests
             }
 
             [Fact]
-            public void Should_register_the_action_in_the_scenario_units()
+            public void Should_register_the_action_in_the_scenario()
             {
                 // arrange
                 var title = Fixture.Create<string>();
                 var expect = new Func<Task>(() => Task.CompletedTask);
 
                 // act
-                var unit = Scenario.Step(title, expect).Units.Single();
+                var unit = Scenario.Step(title, expect).Steps.Single();
                 var actual = Assert.IsType<Step>(unit);
 
                 // assert

@@ -8,7 +8,7 @@ namespace NBDD.V2
         [DebuggerHidden]
         public static Feature Feature(string skip = null, string AsA = null, string IWant = null, string SoThat = null)
         {
-            var feature = Runner.Feature();
+            var feature = new Feature(DI.Global);
             feature.AsA = AsA;
             feature.IWant = IWant;
             feature.SoThat = SoThat;
