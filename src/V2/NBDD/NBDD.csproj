@@ -51,12 +51,13 @@
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureResult.cs" />
     <Compile Include="Runner.cs" />
+    <Compile Include="RunnerTracing.cs" />
     <Compile Include="ScenarioExtensions.cs" />
     <Compile Include="StepResult.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="ScenarioResult.cs" />
     <Compile Include="StepType.cs" />
-    <Compile Include="Tracer.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Step.cs" />
   </ItemGroup>
   <ItemGroup />

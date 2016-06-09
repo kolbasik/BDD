@@ -7,7 +7,7 @@ namespace NBDD.V2
     [DebuggerDisplay("Step: {Success} {Name}")]
     public sealed class StepResult
     {
-        public StepResult(bool? success, string name, TimeSpan? elapsed)
+        private StepResult(bool? success, string name, TimeSpan? elapsed)
         {
             Success = success;
             Name = name;
@@ -17,5 +17,20 @@ namespace NBDD.V2
         public bool? Success { get; }
         public string Name { get; }
         public TimeSpan? Elapsed { get; }
+
+        public static StepResult Skip(string title)
+        {
+            return new StepResult(null, title, null);
+        }
+
+        public static StepResult Done(string title, TimeSpan elapsed)
+        {
+            return new StepResult(true, title, elapsed);
+        }
+
+        public static StepResult Fail(string title, TimeSpan elapsed)
+        {
+            return new StepResult(false, title, elapsed);
+        }
     }
 }

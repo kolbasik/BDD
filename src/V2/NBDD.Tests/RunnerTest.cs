@@ -13,7 +13,7 @@ namespace NBDD.V2.Tests
             public TestBase()
             {
                 Fixture = new Fixture();
-                Feature = Runner.Feature();
+                Feature = new Feature();
             }
 
             public Fixture Fixture { get; }

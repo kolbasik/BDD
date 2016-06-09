@@ -16,7 +16,7 @@ namespace NBDD.V2
         [DebuggerHidden]
         public static Feature UseTrace(this Feature feature, Action<string> trace)
         {
-            return feature.Use(new Tracer(trace));
+            return feature.Use(new Logger(trace));
         }
 
         [DebuggerHidden]
